@@ -19,10 +19,25 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "ExecViewer",
+      "properties": {
+        "execview.enable": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Enable the Extension"
+        }
+      }
+    },
     "commands": [
       {
         "command": "execview.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "execview.openFile",
+        "title": "Open Executable File"
       }
     ],
     "viewsContainers": {
@@ -34,18 +49,30 @@
         }
       ]
     },
+
     "views": {
       "exec-viewer": [
         {
+          "id": "metadata",
+          "name": "Metadata"
+        },
+        {
           "id": "section-view",
-          "name": "Section View"
+          "name": "Sections"
         },
         {
           "id": "segment-view",
-          "name": "Segment View"
+          "name": "Segments"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "metadata",
+        "contents": "In order to use exec-viewer features, you need open a ELF binay.\n[Open File](command:execview.openFile)\nTo learn more about how to use Exec Viewer in VS Code [read our docs](https://pristals.com/exec-viewer).",
+        "when": "config.execview.enable"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
