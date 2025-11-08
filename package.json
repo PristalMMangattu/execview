@@ -25,13 +25,24 @@
         "title": "Hello World"
       }
     ],
-    "views": {
-      "explorer": [
+    "viewsContainers": {
+      "activitybar": [
         {
-          "id": "execview-icon",
-          "name": "Node Dependencies",
-          "icon": "media/dep.svg",
-          "contextualTitle": "Exec Viewer"
+          "id": "exec-viewer",
+          "title": "Executable Viewer",
+          "icon": "media/ev.svg"
+        }
+      ]
+    },
+    "views": {
+      "exec-viewer": [
+        {
+          "id": "section-view",
+          "name": "Section View"
+        },
+        {
+          "id": "segment-view",
+          "name": "Segment View"
         }
       ]
     }
