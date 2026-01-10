@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as view from './webview'
 import { getLogger} from './logger';
 import { Logger } from 'winston';
 
@@ -18,6 +19,8 @@ async function openFile() {
     });
 
     logger.info(`${filePath} is selected`);
+
+    const webView = view.setupWebview();
 }
 
 

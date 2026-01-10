@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as cmds from './commands';
+import * as common from './common';
 import { getLogger, updateLoggerLevel} from './logger';
 import { Logger } from 'winston';
 
@@ -34,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 	context.subscriptions.push(configurationChangeListener);
+	common.setExtensionContext(context);
 }
 
 // This method is called when your extension is deactivated
