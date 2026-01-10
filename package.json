@@ -1,6 +1,6 @@
 {
-  "name": "execview",
-  "displayName": "execview",
+  "name": "elfviz",
+  "displayName": "elfviz",
   "description": "Helps Visualize an Executable/Libraries on a Binary level.",
   "version": "0.0.1",
   "repository": {
@@ -20,38 +20,61 @@
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
-      "title": "ExecViewer",
+      "title": "ExecVisualizer",
       "properties": {
-        "execview.enable": {
+        "elfviz.enable": {
           "type": "boolean",
           "default": true,
           "scope": "window",
           "description": "Enable the Extension"
+        },
+        "elfviz.fileAccess": {
+          "type": "string",
+          "default": "/",
+          "scope": "window",
+          "description": "Restricts the extension to load only from provided path."
+        },
+        "elfviz.logDir": {
+          "type": "string",
+          "default": "{workspace}",
+          "scope": "window",
+          "description": "Directory that will be used to store log files."
+        },
+        "elfviz.logLevel": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "verbose"
+          ],
+          "default": "info",
+          "scope": "window",
+          "description": "Logging level."
         }
       }
     },
     "commands": [
       {
-        "command": "execview.helloWorld",
+        "command": "elfviz.helloWorld",
         "title": "Hello World"
       },
       {
-        "command": "execview.openFile",
+        "command": "elfviz.openFile",
         "title": "Open Executable File"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "exec-viewer",
-          "title": "Executable Viewer",
+          "id": "elfviz",
+          "title": "Executable Visualizer",
           "icon": "media/ev.svg"
         }
       ]
     },
-
     "views": {
-      "exec-viewer": [
+      "elfviz": [
         {
           "id": "metadata",
           "name": "Metadata"
@@ -69,8 +92,8 @@
     "viewsWelcome": [
       {
         "view": "metadata",
-        "contents": "In order to use exec-viewer features, you need open a ELF binay.\n[Open File](command:execview.openFile)\nTo learn more about how to use Exec Viewer in VS Code [read our docs](https://pristals.com/exec-viewer).",
-        "when": "config.execview.enable"
+        "contents": "In order to use exec visualizer features, you need open a ELF binay.\n[Open File](command:elfviz.openFile)\nTo learn more about how to use Exec Viewer in VS Code [read our docs](https://pristals.com/exec-viewer).",
+        "when": "config.elfviz.enable"
       }
     ]
   },
@@ -102,6 +125,10 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "vsce": "^2.15.0"
+    "@vscode-elements/elements": "^2.4.0",
+    "ajv": "^8.17.1",
+    "vsce": "^2.15.0",
+    "winston": "^3.19.0",
+    "winston-transport-vscode": "^0.1.0"
   }
 }
