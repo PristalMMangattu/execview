@@ -1,6 +1,6 @@
 import { exec, spawn } from 'child_process';
 import * as vscode from 'vscode';
-import * as intf from '../intf/interface'
+import * as intf from '../intf/interface';
 import { getLogger} from './logger';
 import { Logger } from 'winston';
 

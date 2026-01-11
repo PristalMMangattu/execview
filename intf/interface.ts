@@ -2,6 +2,10 @@
 // Webview is run in a sandboxed environment and have no access to local file system.
 // Webview takes help of extension to run local programs.
 
+export interface ExecuteCommand {
+    COMMAND: string
+}
+
 export interface Result {
     STDOUT: string,
     STDERR: string,

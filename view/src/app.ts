@@ -1,4 +1,11 @@
 import * as intf from '../../intf/interface'
+//import "vscode-webview"
+
+
+// Declare the acquireVsCodeApi function.
+declare function acquireVsCodeApi(): any;
+
+const vscode = acquireVsCodeApi();
 
 // Get the canvas element and its 2D rendering context
 const element = document.getElementById('myCanvas');
@@ -62,5 +69,14 @@ document.addEventListener('DOMContentLoaded', main);
 // Add event listener for received messages
 const messageEventListener = (event: MessageEvent) => {
     const message = event.data as intf.Result;
-    
+    if (message.EXIT_CODE != 0) {
+        replaceParagraphById('readelf', 'readelf returned and error.');
+    } else {
+        replaceParagraphById('readelf', message.STDOUT);
+    }
+
 }
+
+window.addEventListener('message', messageEventListener);
+
+vscode.postMessage( { COMMAND : "/usr/bin/readelf -h /usr/bin/ls"} );

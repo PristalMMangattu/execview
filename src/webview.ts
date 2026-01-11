@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as fsAsync from 'fs/promises';
 import * as common from './common';
-import * as intf from '../intf/interface'
+import * as intf from '../intf/interface';
 import * as path from 'path';
 import { getLogger} from './logger';
 import { Logger } from 'winston';
@@ -17,8 +17,17 @@ let logger: Logger;
 let webviewPanel: vscode.WebviewPanel | null = null;
 
 
-function messageHandler(message: intf.Result) {
+function messageHandler(message: intf.ExecuteCommand) {
+    logger.info(`Received command to execute : ${message.COMMAND}`);
+    if (!webviewPanel) {
+        vscode.window.showErrorMessage('Webview not initialized.');
+    }
 
+    webviewPanel?.webview.postMessage( {
+        STDOUT: "Hi I am from webview..",
+        STDERR: "None",
+        EXIT_CODE: 0
+    } );
 }
 
 export async function renderWebview(): Promise<vscode.WebviewPanel> {
