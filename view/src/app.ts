@@ -58,4 +58,9 @@ function main() {
 // Run when DOM is ready
 document.addEventListener('DOMContentLoaded', main);
 
+
 // Add event listener for received messages
+const messageEventListener = (event: MessageEvent) => {
+    const message = event.data as intf.Result;
+    
+}
