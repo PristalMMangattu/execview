@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as fsAsync from 'fs/promises';
 import * as common from './common';
-import * as intf from './interface'
+import * as intf from '../intf/interface'
 import * as path from 'path';
 import { getLogger} from './logger';
 import { Logger } from 'winston';

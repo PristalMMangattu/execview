@@ -1,3 +1,5 @@
+import * as intf from '../../intf/interface'
+
 // Get the canvas element and its 2D rendering context
 const element = document.getElementById('myCanvas');
 
@@ -28,3 +30,32 @@ if (element instanceof HTMLCanvasElement) {
 } else {
     console.error("Canvas context not supported in this browser.");
 }
+
+// Function to replace paragraph content by ID
+function replaceParagraphById(
+  id: string, 
+  newContent: string
+): boolean {
+  const paragraph = document.getElementById(id) as HTMLParagraphElement | null;
+  
+  if (!paragraph) {
+    console.error('No paragraph found with ID:', id);
+    return false;
+  }
+  
+  paragraph.textContent = newContent;
+  console.log(`Paragraph "${id}" content replaced successfully`);
+  return true;
+}
+
+// Usage examples
+function main() {
+  // Replace paragraph with specific ID
+  replaceParagraphById('readelf', 'This data should be provided by the extension.');
+  
+}
+
+// Run when DOM is ready
+document.addEventListener('DOMContentLoaded', main);
+
+// Add event listener for received messages
