@@ -1,0 +1,8 @@
+# Exclude dev files
+**/*.ts
+**/tsconfig.json
+**/node_modules/
+**/.git/
+.vscode/
+*.log
+# Do NOT exclude media/ - keep it!

@@ -44,20 +44,7 @@
         <canvas id="myCanvas" width="200" height="200"></canvas>
     </div>
 
-    <script>
-        // JavaScript code to draw on the canvas
-        const canvas = document.getElementById('myCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Draw a blue circle
-        ctx.beginPath();
-        ctx.arc(100, 100, 80, 0, 2 * Math.PI); // Center (100, 100), radius 80
-        ctx.fillStyle = '#007BFF'; // Blue color
-        ctx.fill();
-        ctx.strokeStyle = '#0056b3';
-        ctx.lineWidth = 4;
-        ctx.stroke();
-    </script>
+    <script src="${panel.webview.asWebviewUri('./app.js')}" type="module"></script>
 
 </body>
 </html>

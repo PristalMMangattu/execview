@@ -1,5 +1,6 @@
 import { exec, spawn } from 'child_process';
 import * as vscode from 'vscode';
+import * as intf from './interface'
 import { getLogger} from './logger';
 import { Logger } from 'winston';
 
@@ -11,13 +12,9 @@ let logger: Logger;
 
 let extensionContext: vscode.ExtensionContext | undefined;
 
-export interface Result {
-    STDOUT: string,
-    STDERR: string,
-    EXIT_CODE: number
-}
 
-export async function runProgramAsync(command: string, timeout: number, env?: Record<string, string>): Promise<Result | null> {
+
+export async function runProgramAsync(command: string, timeout: number, env?: Record<string, string>): Promise<intf.Result | null> {
     logger.info(`Executing command : ${command}`);
     return new Promise<{STDOUT: string, STDERR: string, EXIT_CODE: number} | null>((resolve, reject) => {
         const [cmd, ...args] = command.split(' ');

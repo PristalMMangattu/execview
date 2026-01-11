@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as fsAsync from 'fs/promises';
 import * as common from './common';
+import * as intf from './interface'
 import * as path from 'path';
 import { getLogger} from './logger';
 import { Logger } from 'winston';
@@ -16,7 +17,7 @@ let logger: Logger;
 let webviewPanel: vscode.WebviewPanel | null = null;
 
 
-function messageHandler(message: common.Result) {
+function messageHandler(message: intf.Result) {
 
 }
 
@@ -28,7 +29,7 @@ export async function renderWebview(): Promise<vscode.WebviewPanel> {
         logger.info('webview.ts::renderWebview : Extension context is available');
     }
 
-    const viewRootUri = vscode.Uri.file(path.join(context.extensionPath, 'view'));
+    const viewRootUri = vscode.Uri.file(path.join(context.extensionPath, 'view/dist'));
     if (!fs.existsSync(viewRootUri.fsPath)) {
         throw new Error(`Views root path not found : ${viewRootUri.fsPath}`);
     } else {
@@ -48,10 +49,21 @@ export async function renderWebview(): Promise<vscode.WebviewPanel> {
         }
     );
 
-    const htmlPath = vscode.Uri.file(path.join(context.extensionPath, 'view/index.html'));
+    const htmlPath = vscode.Uri.file(path.join(context.extensionPath, 'view/dist/index.html'));
     const htmlContent = await fsAsync.readFile(htmlPath.fsPath, 'utf8');
 
-    webviewPanel.webview.html = htmlContent;
+
+    const baseUri = webviewPanel.webview.asWebviewUri(viewRootUri);  // true = query-encoded
+
+    // Replace relative paths with asWebviewUri-resolved paths
+    let html = htmlContent.replace(
+        /src=["'](\.\/[^"']*)["']/g,
+        (match, p1) => {
+            console.log('Captured:', p1);  // Should log: ./app.js
+            return `src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(baseUri, p1))}"`;
+        });
+
+    webviewPanel.webview.html = html;
 
     return webviewPanel;
 }
