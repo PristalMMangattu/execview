@@ -28,6 +28,7 @@ export async function runProgramAsync(command: string, timeout: number, env?: Re
 
         let stdoutData = '';
         let stderrData = '';
+        let exitCode : number | null = null;
 
         const timeoutId = setTimeout(() => {
             child.kill();
@@ -38,10 +39,22 @@ export async function runProgramAsync(command: string, timeout: number, env?: Re
             stdoutData += data.toString();
         });
 
+        child.stderr.on('data', (data) => {
+            stderrData += data.toString();
+        });
+
+        child.on('close', (code, signal) => {
+            exitCode = code;
+        });
+
+        if (exitCode === null) {
+            exitCode = 255;
+        }
+
         resolve({
-            STDOUT: '',
-            STDERR: '',
-            EXIT_CODE: 0
+            STDOUT: stdoutData,
+            STDERR: stderrData,
+            EXIT_CODE: exitCode
         });
     });
 }

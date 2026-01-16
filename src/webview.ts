@@ -15,19 +15,72 @@ let logger: Logger;
 })();
 
 let webviewPanel: vscode.WebviewPanel | null = null;
+let programUnderObservation: string | undefined = undefined;
 
+async function executeReqHandler(id: string, command: intf.Command) : Promise<intf.Response>{
+    const config = vscode.workspace.getConfiguration('elfviz');
+    let prog: string | undefined = undefined;
+    if (command.prog === "readelf") {
+        prog = config.get<string>('readelfPath');
+    } else if (command.prog === 'objdump') {
+        prog = config.get<string>('objdumpPath');
+    } else if (command.prog === 'hexdump') {
+        prog = config.get<string>('hexdumpPath');
+    } else {
+        throw new Error(`Request to execute unknown program '${command.prog}'`);
+    }
 
-function messageHandler(message: intf.ExecuteCommand) {
-    logger.info(`Received command to execute : ${message.COMMAND}`);
+    if (!fs.existsSync(command.prog)) {
+        throw new Error(`Program "${command.prog}" does not exist.`);
+    }
+
+    const timeout = config.get<number>('commandTimeout') ?? 30;
+    const exec = prog + ' ' + command.args.join(' ');
+    let result = await common.runProgramAsync(exec, timeout * 1000, command.env)
+    if (!result) {
+        throw new Error(`Error while executing command : ${command}`)
+    }
+    let response  = {
+        id: id,
+        out: result
+    }
+
+    return response;
+}
+
+async function initReqHandler(id: string) : Promise<intf.Response>{
+    if (!programUnderObservation) {
+        throw new Error(`Program is not set yet.`)
+    }
+
+    let response = {
+        id: id,
+        out: programUnderObservation
+    };
+
+    return response;
+}
+
+async function messageHandler(message: intf.Request) {
+    logger.info(`Received command to execute : ${message.data}`);
     if (!webviewPanel) {
         vscode.window.showErrorMessage('Webview not initialized.');
     }
 
-    webviewPanel?.webview.postMessage( {
-        STDOUT: "Hi I am from webview..",
-        STDERR: "None",
-        EXIT_CODE: 0
-    } );
+    let response: intf.Response;
+    try {
+        if (message.type === intf.RequestType.EXECUTE) {
+            response = await executeReqHandler(message.id, message.data as intf.Command);
+            webviewPanel?.webview.postMessage(response);
+        } else if (message.type == intf.RequestType.INIT) {
+            response = await initReqHandler(message.id);
+            webviewPanel?.webview.postMessage(response);
+        } else {
+            throw new Error('Unknow request type.');
+        }
+    } catch (error) {
+        vscode.window.showErrorMessage(String(error));
+    }
 }
 
 export async function renderWebview(): Promise<vscode.WebviewPanel> {
@@ -77,7 +130,8 @@ export async function renderWebview(): Promise<vscode.WebviewPanel> {
     return webviewPanel;
 }
 
-export async function setupWebview(): Promise<vscode.WebviewPanel | null> {
+export async function setupWebview(prog: string): Promise<vscode.WebviewPanel | null> {
+    programUnderObservation = prog;
     if (webviewPanel) {
         logger.info('Webview Panel already exists..');
         webviewPanel.reveal(vscode.ViewColumn.Active);

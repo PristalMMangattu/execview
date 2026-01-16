@@ -1,11 +1,13 @@
 import * as intf from '../../intf/interface'
+import * as elf from './elf'
+import * as common from './common'
 //import "vscode-webview"
-
 
 // Declare the acquireVsCodeApi function.
 declare function acquireVsCodeApi(): any;
 
 const vscode = acquireVsCodeApi();
+const responseHandler = new common.ResposeHandler();
 
 // Get the canvas element and its 2D rendering context
 const element = document.getElementById('myCanvas');
@@ -59,6 +61,7 @@ function replaceParagraphById(
 function main() {
   // Replace paragraph with specific ID
   replaceParagraphById('readelf', 'This data should be provided by the extension.');
+  vscode.postMessage( { COMMAND : "/usr/bin/readelf -h /usr/bin/ls"} );
   
 }
 
@@ -68,15 +71,9 @@ document.addEventListener('DOMContentLoaded', main);
 
 // Add event listener for received messages
 const messageEventListener = (event: MessageEvent) => {
-    const message = event.data as intf.Result;
-    if (message.EXIT_CODE != 0) {
-        replaceParagraphById('readelf', 'readelf returned and error.');
-    } else {
-        replaceParagraphById('readelf', message.STDOUT);
-    }
-
+    const message = event.data as intf.Response;
+    responseHandler.handleResponse(message);
 }
 
 window.addEventListener('message', messageEventListener);
 
-vscode.postMessage( { COMMAND : "/usr/bin/readelf -h /usr/bin/ls"} );

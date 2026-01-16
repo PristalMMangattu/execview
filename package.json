@@ -34,9 +34,39 @@
           "scope": "window",
           "description": "Restricts the extension to load only from provided path."
         },
+        "elfviz.fileUtilPath": {
+          "type": "string",
+          "default": "/usr/bin/file",
+          "scope": "window",
+          "description": "Path to file utility."
+        },
+        "elfviz.readelfPath": {
+          "type": "string",
+          "default": "/usr/bin/readelf",
+          "scope": "window",
+          "description": "Path to readelf utility."
+        },
+        "elfviz.objdumpPath": {
+          "type": "string",
+          "default": "/usr/bin/objdump",
+          "scope": "window",
+          "description": "Path to objdump utility."
+        },
+        "elfviz.hexdumpPath": {
+          "type": "string",
+          "default": "/usr/bin/objdump",
+          "scope": "window",
+          "description": "Path to hex utility."
+        },
+        "elfviz.commandTimeout": {
+          "type": "number",
+          "default": 60,
+          "scope": "window",
+          "description": "Command execution timeout."
+        },
         "elfviz.logDir": {
           "type": "string",
-          "default": "{workspace}",
+          "default": "/var/tmp/elfviz/",
           "scope": "window",
           "description": "Directory that will be used to store log files."
         },
@@ -68,7 +98,7 @@
       "activitybar": [
         {
           "id": "elfviz",
-          "title": "Executable Visualizer",
+          "title": "ELF Visualizer",
           "icon": "media/ev.svg"
         }
       ]
