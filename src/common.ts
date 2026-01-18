@@ -16,7 +16,7 @@ let extensionContext: vscode.ExtensionContext | undefined;
 
 export async function runProgramAsync(command: string, timeout: number, env?: Record<string, string>): Promise<intf.Result | null> {
     logger.info(`Executing command : ${command}`);
-    return new Promise<{STDOUT: string, STDERR: string, EXIT_CODE: number} | null>((resolve, reject) => {
+    return new Promise<intf.Result | null>((resolve, reject) => {
         const [cmd, ...args] = command.split(' ');
         const spawnOptions: any = { shell: true };
     
@@ -28,7 +28,7 @@ export async function runProgramAsync(command: string, timeout: number, env?: Re
 
         let stdoutData = '';
         let stderrData = '';
-        let exitCode : number | null = null;
+        let exitCode : number;
 
         const timeoutId = setTimeout(() => {
             child.kill();
@@ -43,19 +43,29 @@ export async function runProgramAsync(command: string, timeout: number, env?: Re
             stderrData += data.toString();
         });
 
-        child.on('close', (code, signal) => {
-            exitCode = code;
+        child.on('close', (code) => {
+            clearTimeout(timeoutId);
+            resolve({
+                stdout:stdoutData,
+                stderr: stderrData,
+                exitCode: code || 0
+            });
         });
 
-        if (exitCode === null) {
-            exitCode = 255;
+        child.on('error', (error) => {
+            clearTimeout(timeoutId);
+            reject(error);
+        });
+    }).catch((error: any) => {
+        if (error.message === 'Command timed out') {
+            return null;
         }
 
-        resolve({
-            STDOUT: stdoutData,
-            STDERR: stderrData,
-            EXIT_CODE: exitCode
-        });
+        return {
+            stdout: error.stdout,
+            stderr: error.stderr,
+            exitCode: error.code || 1
+        };
     });
 }
 

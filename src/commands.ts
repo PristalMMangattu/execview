@@ -33,15 +33,15 @@ async function isValidElfFile(prog: string): Promise<boolean> {
     const result = await common.runProgramAsync(command, timeout);
 
     if (!result) {
-        throw new Error(`Issue while executing 'file' command`)
+        throw new Error(`Issue while executing 'file' command`);
     }
 
-    if (result.EXIT_CODE != 0) {
-        throw new Error(`'file' command returned exit code '${String(result.EXIT_CODE)}' (non-zero).`)
+    if (result.exitCode !== 0) {
+        throw new Error(`'file' command returned exit code '${String(result.exitCode)}' (non-zero).`);
     }
 
     // Check if 'ELF' string is present in file command output.
-    const out = result.STDOUT;
+    const out = result.stdout;
     logger.info(`file command out : ${out}`);
     if (/ELF/.test(out)) {
         return true;

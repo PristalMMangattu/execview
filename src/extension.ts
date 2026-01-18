@@ -17,13 +17,13 @@ let logger: Logger;
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	console.log('Congratulations, your extension "execview" is now active!');
+	console.log('Congratulations, your extension "elfviz" is now active!');
 
 
-	const disposable = vscode.commands.registerCommand('execview.helloWorld', () => {
+	const disposable = vscode.commands.registerCommand('elfviz.helloWorld', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from execview!');
+		vscode.window.showInformationMessage('Hello World from elfviz!');
 	});
 
 	cmds.registerAllCommands(context);

@@ -16,7 +16,7 @@ export interface Command {
 export interface Request {
     id: string,
     type: RequestType,
-    data?: Command | string // This can be anything depending on request type.
+    data?: Command | string | undefined // This can be anything depending on request type.
 }
 
 export interface Response {
@@ -25,9 +25,9 @@ export interface Response {
 }
 
 export interface Result {
-    STDOUT: string,
-    STDERR: string,
-    EXIT_CODE: number
+    stdout: string,
+    stderr: string,
+    exitCode: number
 }
 
 // Following Interfaces are used to communicate to view about user selection from activity bar.

@@ -36,21 +36,21 @@ async function executeReqHandler(id: string, command: intf.Command) : Promise<in
 
     const timeout = config.get<number>('commandTimeout') ?? 30;
     const exec = prog + ' ' + command.args.join(' ');
-    let result = await common.runProgramAsync(exec, timeout * 1000, command.env)
+    let result = await common.runProgramAsync(exec, timeout * 1000, command.env);
     if (!result) {
-        throw new Error(`Error while executing command : ${command}`)
+        throw new Error(`Error while executing command : ${command}`);
     }
     let response  = {
         id: id,
         out: result
-    }
+    };
 
     return response;
 }
 
 async function initReqHandler(id: string) : Promise<intf.Response>{
     if (!programUnderObservation) {
-        throw new Error(`Program is not set yet.`)
+        throw new Error(`Program is not set yet.`);
     }
 
     let response = {
@@ -62,7 +62,7 @@ async function initReqHandler(id: string) : Promise<intf.Response>{
 }
 
 async function messageHandler(message: intf.Request) {
-    logger.info(`Received command to execute : ${message.data}`);
+    logger.info(`Received message ID : ${message.id}`);
     if (!webviewPanel) {
         vscode.window.showErrorMessage('Webview not initialized.');
     }
@@ -72,7 +72,7 @@ async function messageHandler(message: intf.Request) {
         if (message.type === intf.RequestType.EXECUTE) {
             response = await executeReqHandler(message.id, message.data as intf.Command);
             webviewPanel?.webview.postMessage(response);
-        } else if (message.type == intf.RequestType.INIT) {
+        } else if (message.type === intf.RequestType.INIT) {
             response = await initReqHandler(message.id);
             webviewPanel?.webview.postMessage(response);
         } else {
