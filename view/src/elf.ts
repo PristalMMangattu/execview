@@ -285,6 +285,7 @@ function programHeaderParser(data: intf.Result, vscode: any) {
     common.setStatePartial(vscode, state);
     
     console.log(`State updated with ${programHeaders.length} program headers`);
+    console.log('State in programHeaderParser:', vscode.getState());
 }
 
 
@@ -360,7 +361,7 @@ function sectionHeaderParser(data: intf.Result, vscode: any) {
 
         const sectionHeader: SectionHeader = {
             Nr: parseInt(nr),
-            Name: name.trim() || '',
+            Name: name ?? '',
             Type: type,
             Address: parseInt(address, 16),
             Offset: parseInt(offset, 16),
@@ -388,6 +389,7 @@ function sectionHeaderParser(data: intf.Result, vscode: any) {
     common.setStatePartial(vscode, state);
     
     console.log(`State updated with ${sectionHeaders.length} section headers`);
+    console.log('State in sectionHeaderParser:', vscode.getState());
 }
 
 //****** Public API*******// 
