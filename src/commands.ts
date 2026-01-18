@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as fsAsync from 'fs/promises';
+import { MyDataProvider } from './activity'
 import * as common from './common';
 import * as view from './webview';
 import { getLogger} from './logger';
@@ -76,6 +77,10 @@ async function openFile() {
     }
 
     const webView = view.setupWebview(filePath);
+
+    // Tree view provider is registered only after a file is opened.
+    const provider = new MyDataProvider();
+    vscode.window.registerTreeDataProvider('metadata', provider);
 }
 
 

@@ -75,6 +75,8 @@ async function messageHandler(message: intf.Request) {
         } else if (message.type === intf.RequestType.INIT) {
             response = await initReqHandler(message.id);
             webviewPanel?.webview.postMessage(response);
+        } else if (message.type === intf.RequestType.ACTIVITY) {
+        
         } else {
             throw new Error('Unknow request type.');
         }
