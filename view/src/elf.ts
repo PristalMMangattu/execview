@@ -187,7 +187,7 @@ function elfHeaderParser(data: intf.Result, vscode: any, program:string) {
 
 
 //******Segment Header Related*******// 
-export function getElf() {
-    getElfHeader
+export function getElf(vscode: any, program: string, handle: common.ResposeHandler) {
+    getElfHeader(vscode, program, handle);
 }
 

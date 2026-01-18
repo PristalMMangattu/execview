@@ -78,6 +78,9 @@ function main() {
   // Replace paragraph with specific ID
   replaceParagraphById('readelf', 'This data should be provided by the extension.');
   sendInitMessage()
+  const state = vscode.getState();
+  console.log(`state: ${state}`);
+  //elf.getElf(vscode, )
   
 }
 

@@ -4,6 +4,7 @@
 
 export enum RequestType {
     INIT,
+    ACTIVITY,
     EXECUTE,
 }
 
@@ -16,7 +17,7 @@ export interface Command {
 export interface Request {
     id: string,
     type: RequestType,
-    data?: Command | string | undefined // This can be anything depending on request type.
+    data?: Command | ActivityBar | string | undefined // This can be anything depending on request type.
 }
 
 export interface Response {
@@ -33,15 +34,20 @@ export interface Result {
 // Following Interfaces are used to communicate to view about user selection from activity bar.
 // This is to support updating view based on user selection is activity bar.
 export enum HeaderType {
-    ELF_HEADER,
-    PROG_HEADER,
-    SEC_HEADER
+    ELF,
+    PROG,
+    SECT
 }
 
+// This is sent from extension to webview to indicate user selection.
 export interface ActivityBarSelection {
-    HEADER: HeaderType,
-    NAME: string
+    header: HeaderType,
+    name: string
 }
 
-
+// This data is sent from webview to extension to populate activity bar.
+export interface ActivityBar {
+    header: HeaderType,
+    data: string[]
+}
 

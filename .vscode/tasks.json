@@ -6,6 +6,7 @@
 		{
             "label": "watch",
             "dependsOn": [
+                "complete-build",
                 "npm: watch:tsc",
                 "npm: watch:esbuild"
             ],
@@ -27,6 +28,21 @@
             "presentation": {
                 "group": "watch",
                 "reveal": "never"
+            }
+        },
+        {
+            "label": "complete-build",
+            "type": "shell",
+            "command": "./build.sh",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
             }
         },
 		{
