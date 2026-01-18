@@ -122,7 +122,7 @@
     "viewsWelcome": [
       {
         "view": "metadata",
-        "contents": "In order to use exec visualizer features, you need open a ELF binay.\n[Open File](command:elfviz.openFile)\nTo learn more about how to use Exec Viewer in VS Code [read our docs](https://pristals.com/exec-viewer).",
+        "contents": "In order to use elfviz features, you need open a ELF binay.\n[Open File](command:elfviz.openFile)\nTo learn more about how to use ELF Visualizer in VS Code [read our docs](https://pristals.com/exec-viewer).",
         "when": "config.elfviz.enable"
       }
     ]

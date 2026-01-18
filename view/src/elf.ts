@@ -50,7 +50,7 @@ export interface ProgramHeader {
     PhysAddr: number,
     FileSiz: number,
     MemSize: number,
-    Flg: ProgramHeaderFlag,
+    Flg: ProgramHeaderFlag[],
     Align: number,
     Sections: string[]
 }
@@ -91,7 +91,7 @@ export interface SectionHeader {
     Offset: number,
     Size: number,
     EntSize: number,
-    Flags:  SectionHeaderFlag,
+    Flags:  SectionHeaderFlag[],
     Link: number, // Link to another section.
     Info: number, // Holds extra information.
     Align: number
@@ -180,16 +180,220 @@ function elfHeaderParser(data: intf.Result, vscode: any) {
 
 //******Program Header Related*******// 
 
+// Post command for getting program headers and setup callback
+function getProgramHeaders(vscode: any, program: string, handle: common.ResposeHandler) {
+    handle.registerHandler("pheaders", (d) => programHeaderParser(d, vscode));
+    vscode.postMessage({ 
+        id: "pheaders",
+        type: intf.RequestType.EXECUTE,
+        data: {
+            prog: "readelf",
+            args: ["-lW", `${program}`],
+        }
+    });
+}
 
+const PROGRAM_HEADER_LINE_REGEX = /^(\w+) +([0-9a-f]+) +([0-9a-f]+) +([0-9a-f]+) +([0-9a-f]+) +([0-9a-f]+) +([REW ]+) +([0-9a-f]+)/i;
 
+function programHeaderParser(data: intf.Result, vscode: any) {
+    if (data.exitCode) {
+        console.log(`'readelf -lW <prog>', exit code is ${data.exitCode} (non-zero)`);
+        return;
+    }
+
+    if (!data.stdout) {
+        console.log(`'readelf -lW <prog>', stdout is empty.`);
+        return;
+    }
+
+    const programHeaders: ProgramHeader[] = [];
+    const lines = data.stdout.split('\n');
+    let inProgramHeaders = false;
+    
+    for (const line of lines) {
+        // Skip until we reach Program Headers section
+        if (line.includes('Program Headers:')) {
+            inProgramHeaders = true;
+            continue;
+        }
+        
+        // Skip section mapping and other lines
+        if (inProgramHeaders && line.trim() === '') {
+            break;
+        }
+        
+        if (!inProgramHeaders || line.trim().length === 0) {
+            continue;
+        }
+
+        const match = line.match(PROGRAM_HEADER_LINE_REGEX);
+        if (!match) continue;
+
+        const [
+            _full,      // 0: full match
+            typeStr,    // 1: Type
+            offset,     // 2: Offset (hex)
+            virtAddr,   // 3: VirtAddr (hex)
+            physAddr,   // 4: PhysAddr (hex)
+            fileSiz,    // 5: FileSiz (hex)
+            memSize,    // 6: MemSiz (hex)
+            flags,      // 7: Flg (R, E, W, or combinations like REW)
+            align       // 8: Align (hex)
+        ] = match;
+
+        // Map type string to ProgramHeaderType enum
+        const type = (Object.values(ProgramHeaderType) as string[]).includes(typeStr) 
+            ? typeStr as ProgramHeaderType 
+            : ProgramHeaderType.PTNull;
+
+        // Parse ALL flags - handle combinations (R, E, W, RE, RW, REW, etc.)
+        const flagChars = flags.trim().split('').filter(c => c !== ' ');
+        const flagArray: ProgramHeaderFlag[] = flagChars.map(f => {
+            switch (f) {
+                case 'R': return ProgramHeaderFlag.Read;
+                case 'W': return ProgramHeaderFlag.Write;
+                case 'E': return ProgramHeaderFlag.Execute;
+                default: return null as any;
+            }
+        }).filter((f): f is ProgramHeaderFlag => f !== null);
+
+        const programHeader: ProgramHeader = {
+            Type: type,
+            Offset: parseInt(offset, 16),
+            VirtAddr: parseInt(virtAddr, 16),
+            PhysAddr: parseInt(physAddr, 16),
+            FileSiz: parseInt(fileSiz, 16),
+            MemSize: parseInt(memSize, 16),
+            Flg: flagArray,  // Now correctly typed as ProgramHeaderFlag[]
+            Align: parseInt(align, 16),
+            Sections: []     // Will be populated later if needed
+        };
+
+        programHeaders.push(programHeader);
+    }
+
+    if (programHeaders.length === 0) {
+        console.log('No program headers parsed from readelf -lW output');
+        return;
+    }
+
+    console.log(`Parsed ${programHeaders.length} program headers`);
+
+    // Update state with program headers
+    let state: common.State = {} as common.State;
+    state.programHeaders = programHeaders;
+    common.setStatePartial(vscode, state);
+    
+    console.log(`State updated with ${programHeaders.length} program headers`);
+}
 
 
 //******Segment Header Related*******// 
+// Post command for getting section headers and setup callback
+function getSectionHeaders(vscode: any, program: string, handle: common.ResposeHandler) {
+    handle.registerHandler("sheaders", (d) => sectionHeaderParser(d, vscode));
+    vscode.postMessage({ 
+        id: "sheaders",
+        type: intf.RequestType.EXECUTE,
+        data: {
+            prog: "readelf",
+            args: ["-SW", `${program}`],
+        }
+    });
+}
 
+type SectionHeaderParser = (match: RegExpMatchArray) => Partial<SectionHeader>;
 
+const SECTION_HEADER_LINE_REGEX = /^\s*\[\s*(\d+)\]\s+(\S+)?\s+(\S+)\s+([0-9a-f]+)\s+([0-9a-f]+)\s+([0-9a-f]+)\s+([0-9a-f]+)\s+([WAXEMISILO]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i;
 
-//******Segment Header Related*******// 
+function sectionHeaderParser(data: intf.Result, vscode: any) {
+    if (data.exitCode) {
+        console.log(`'readelf -SW <prog>', exit code is ${data.exitCode} (non-zero)`);
+        return;
+    }
+
+    if (!data.stdout) {
+        console.log(`'readelf -SW <prog>', stdout is empty.`);
+        return;
+    }
+
+    const sectionHeaders: SectionHeader[] = [];
+    const lines = data.stdout.split('\n');
+    
+    for (const line of lines) {
+        const match = line.match(SECTION_HEADER_LINE_REGEX);
+        if (!match) {
+            console.log(`No Match : ${line}`);
+            continue;
+        }
+
+        const [
+            _full,      // 0: full match
+            nr,         // 1: [Nr]
+            name,       // 2: Name
+            typeStr,    // 3: Type
+            address,    // 4: Address (hex)
+            offset,     // 5: Off (hex)
+            size,       // 6: Size (hex)
+            entSize,    // 7: ES (decimal)
+            flags,      // 8: Flg
+            link,       // 9: Lk
+            info,       // 10: Inf
+            align       // 11: Al
+        ] = match;
+
+        // Map type string to SectionHeaderType enum (handle unknown types gracefully)
+        const type = (Object.values(SectionHeaderType) as string[]).includes(typeStr) 
+            ? typeStr as SectionHeaderType 
+            : SectionHeaderType.SHTNull;
+
+        // Map ALL flags string chars to SectionHeaderFlag enum array
+        const flagArray: SectionHeaderFlag[] = flags.split('').map(f => {
+            switch (f) {
+                case 'W': return SectionHeaderFlag.SHFWrite;
+                case 'A': return SectionHeaderFlag.SHFAlloc;
+                case 'X': return SectionHeaderFlag.SHFExecInstr;
+                case 'M': return SectionHeaderFlag.SHRMaskProc;
+                default: return null as any;
+            }
+        }).filter((f): f is SectionHeaderFlag => f !== null);
+
+        const sectionHeader: SectionHeader = {
+            Nr: parseInt(nr),
+            Name: name.trim() || '',
+            Type: type,
+            Address: parseInt(address, 16),
+            Offset: parseInt(offset, 16),
+            Size: parseInt(size, 16),
+            EntSize: parseInt(entSize),
+            Flags: flagArray,  // Now correctly typed as SectionHeaderFlag[]
+            Link: parseInt(link),
+            Info: parseInt(info),
+            Align: parseInt(align)
+        };
+
+        sectionHeaders.push(sectionHeader);
+    }
+
+    if (sectionHeaders.length === 0) {
+        console.log('No section headers parsed from readelf -SW output');
+        return;
+    }
+
+    console.log(`Parsed ${sectionHeaders.length} section headers`);
+
+    // Update state with section headers
+    let state: common.State = {} as common.State;
+    state.sectionHeaders = sectionHeaders;
+    common.setStatePartial(vscode, state);
+    
+    console.log(`State updated with ${sectionHeaders.length} section headers`);
+}
+
+//****** Public API*******// 
 export function getElf(vscode: any, program: string, handle: common.ResposeHandler) {
     getElfHeader(vscode, program, handle);
+    getProgramHeaders(vscode, program, handle);
+    getSectionHeaders(vscode, program, handle);
 }
 

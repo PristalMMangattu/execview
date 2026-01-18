@@ -6,8 +6,8 @@ import * as elf from './elf'
 export interface State {
     program: string,
     elfHeader: elf.ElfHeader,
-    progHeader: elf.ProgramHeader[],
-    sectHeader: elf.SectionHeader[]
+    programHeaders: elf.ProgramHeader[],
+    sectionHeaders: elf.SectionHeader[]
 }
 
 export function setStatePartial(vscode: any, partial: Partial<State>): void {
