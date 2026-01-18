@@ -30,8 +30,8 @@ async function executeReqHandler(id: string, command: intf.Command) : Promise<in
         throw new Error(`Request to execute unknown program '${command.prog}'`);
     }
 
-    if (!fs.existsSync(command.prog)) {
-        throw new Error(`Program "${command.prog}" does not exist.`);
+    if (!fs.existsSync(prog!)) {
+        throw new Error(`Program "${prog}" does not exist.`);
     }
 
     const timeout = config.get<number>('commandTimeout') ?? 30;

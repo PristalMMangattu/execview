@@ -108,7 +108,7 @@ export interface Elf {
 
 // Post command for getting elf header and setup up callback to be called on receiving the response.
 function getElfHeader(vscode: any, program: string, handle: common.ResposeHandler) {
-    handle.registerHandler("eheader", (d) => elfHeaderParser(d, vscode, program))
+    handle.registerHandler("eheader", (d) => elfHeaderParser(d, vscode))
     vscode.postMessage({ 
         id: "eheader",
         type: intf.RequestType.EXECUTE,
@@ -149,7 +149,7 @@ const ELF_HEADER_FIELD_PATTERNS: Array<{ regex: RegExp, field: keyof ElfHeader, 
     { regex: /Section header string table index:\s+(\d+)/, field: 'SHStringTableIdx', parser: (m) => parseInt(m[1]!) }
 ];
 
-function elfHeaderParser(data: intf.Result, vscode: any, program:string) {
+function elfHeaderParser(data: intf.Result, vscode: any) {
     if (data.exitCode) {
         console.log(`'readelf -h <prog>', exit code is ${data.exitCode} (non-zero)`);
     }
@@ -172,8 +172,10 @@ function elfHeaderParser(data: intf.Result, vscode: any, program:string) {
     }
 
     const elfHeader = result as ElfHeader;
-    
-    vscode.setState({program : {ehdr: elfHeader}});
+    let state: common.State = {} as common.State;
+    state.elfHeader = elfHeader;
+    common.setStatePartial(vscode, state);
+    console.log('State in elfHeaderParser:', vscode.getState());
 }
 
 //******Program Header Related*******// 
