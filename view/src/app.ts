@@ -62,7 +62,10 @@ function replaceParagraphById(
 function sendInitMessage() {
     responseHandler.registerHandler("init", (data: string) => {
         console.log(`Program : ${data}`);
-        vscode.setState({data : {}});
+        let state: common.State = {} as common.State;
+        state.program = data;
+        common.setStatePartial(vscode, state);
+        console.log('State :', state);
     });
 
     const msg = { 
@@ -78,8 +81,7 @@ function main() {
   // Replace paragraph with specific ID
   replaceParagraphById('readelf', 'This data should be provided by the extension.');
   sendInitMessage()
-  const state = vscode.getState();
-  console.log(`state: ${state}`);
+
   //elf.getElf(vscode, )
   
 }

@@ -4,7 +4,15 @@ import * as elf from './elf'
 
 
 export interface State {
-    program: elf.Elf
+    program: string,
+    elfHeader: elf.ElfHeader,
+    progHeader: elf.ProgramHeader[],
+    sectHeader: elf.SectionHeader[]
+}
+
+export function setStatePartial(vscode: any, partial: Partial<State>): void {
+    const current = (vscode.getState() as State) || { program: '', elfHeader: {} as elf.ElfHeader, progHeader: [], sectHeader: []};
+    vscode.setState({ ...current, ...partial } as State);
 }
 
 type MessageCallback = (message: any) => void;
