@@ -5,13 +5,14 @@ import * as elf from './elf'
 
 export interface State {
     program: string,
+    interpreter: string,
     elfHeader: elf.ElfHeader,
     programHeaders: elf.ProgramHeader[],
     sectionHeaders: elf.SectionHeader[]
 }
 
 export function setStatePartial(vscode: any, partial: Partial<State>): void {
-    const current = (vscode.getState() as State) || { program: '', elfHeader: {} as elf.ElfHeader, progHeader: [], sectHeader: []};
+    const current = (vscode.getState() as State) || { program: '', interpreter: '', elfHeader: {} as elf.ElfHeader, programHeaders: [] as elf.ProgramHeader[], sectionHeaders: [] as elf.SectionHeader[]};
     vscode.setState({ ...current, ...partial } as State);
 }
 

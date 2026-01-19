@@ -223,6 +223,7 @@ function programHeaderParser(data: intf.Result, vscode: any) {
     const lines = data.stdout.split('\n');
     let inProgramHeaders = false;
     let inSecSegMapping = false;
+    let foundInterpreter = false;
     
     for (const line of lines) {
         // Skip until we reach Program Headers section
@@ -234,6 +235,18 @@ function programHeaderParser(data: intf.Result, vscode: any) {
         if (line.includes('Section to Segment mapping:')) {
             inProgramHeaders = false;
             inSecSegMapping = true;
+            continue;
+        }
+
+        if (!foundInterpreter && line.includes('program interpreter')) {
+            const interpreterMatch = line.match(/\s*\[.*:\s*(\S+)\]/)
+            if (!interpreterMatch) continue;
+
+            // Update state with program headers
+            let state: common.State = {} as common.State;
+            state.interpreter = interpreterMatch[1];
+            console.log(`Interpreter : ${state.interpreter}`);
+            common.setStatePartial(vscode, state);
             continue;
         }
         
