@@ -206,6 +206,7 @@ function getProgramHeaders(vscode: any, program: string, handle: common.ResposeH
 }
 
 const PROGRAM_HEADER_LINE_REGEX = /^\s*([A-Z_]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+([REW ]+)\s+(0x[0-9a-f]+)\s*$/i;
+const SECTION_SEGMENT_MAP_REGEX = /^\s*(\d+)\s*(.*)/i
 
 function programHeaderParser(data: intf.Result, vscode: any) {
     if (data.exitCode) {
@@ -221,6 +222,7 @@ function programHeaderParser(data: intf.Result, vscode: any) {
     const programHeaders: ProgramHeader[] = [];
     const lines = data.stdout.split('\n');
     let inProgramHeaders = false;
+    let inSecSegMapping = false;
     
     for (const line of lines) {
         // Skip until we reach Program Headers section
@@ -228,60 +230,86 @@ function programHeaderParser(data: intf.Result, vscode: any) {
             inProgramHeaders = true;
             continue;
         }
-        
-        // Skip section mapping and other lines
-        if (inProgramHeaders && line.trim() === '') {
-            break;
+
+        if (line.includes('Section to Segment mapping:')) {
+            inProgramHeaders = false;
+            inSecSegMapping = true;
+            continue;
         }
         
-        if (!inProgramHeaders || line.trim().length === 0) {
+        // Skip empty lines
+        if (line.trim().length === 0 || line.trim() === '') {
             continue;
         }
 
-        const match = line.match(PROGRAM_HEADER_LINE_REGEX);
-        if (!match) continue;
+        let match: RegExpMatchArray | null = null;
+        if (inProgramHeaders) {
+            match = line.match(PROGRAM_HEADER_LINE_REGEX);
+            if (!match) continue;
 
-        const [
-            _full,      // 0: full match
-            typeStr,    // 1: Type
-            offset,     // 2: Offset (hex)
-            virtAddr,   // 3: VirtAddr (hex)
-            physAddr,   // 4: PhysAddr (hex)
-            fileSiz,    // 5: FileSiz (hex)
-            memSize,    // 6: MemSiz (hex)
-            flags,      // 7: Flg (R, E, W, or combinations like REW)
-            align       // 8: Align (hex)
-        ] = match;
+            const [
+                _full,      // 0: full match
+                typeStr,    // 1: Type
+                offset,     // 2: Offset (hex)
+                virtAddr,   // 3: VirtAddr (hex)
+                physAddr,   // 4: PhysAddr (hex)
+                fileSiz,    // 5: FileSiz (hex)
+                memSize,    // 6: MemSiz (hex)
+                flags,      // 7: Flg (R, E, W, or combinations like REW)
+                align       // 8: Align (hex)
+            ] = match;
 
-        // Map type string to ProgramHeaderType enum
-        const type = (Object.values(ProgramHeaderType) as string[]).includes(typeStr) 
-            ? typeStr as ProgramHeaderType 
-            : ProgramHeaderType.PTNull;
+            // Map type string to ProgramHeaderType enum
+            const type = (Object.values(ProgramHeaderType) as string[]).includes(typeStr) 
+                ? typeStr as ProgramHeaderType 
+                : ProgramHeaderType.PTNull;
 
-        // Parse ALL flags - handle combinations (R, E, W, RE, RW, REW, etc.)
-        const flagChars = flags.trim().split('').filter(c => c !== ' ');
-        const flagArray: ProgramHeaderFlag[] = flagChars.map(f => {
-            switch (f) {
-                case 'R': return ProgramHeaderFlag.Read;
-                case 'W': return ProgramHeaderFlag.Write;
-                case 'E': return ProgramHeaderFlag.Execute;
-                default: return null as any;
+            // Parse ALL flags - handle combinations (R, E, W, RE, RW, REW, etc.)
+            const flagChars = flags.trim().split('').filter(c => c !== ' ');
+            const flagArray: ProgramHeaderFlag[] = flagChars.map(f => {
+                switch (f) {
+                    case 'R': return ProgramHeaderFlag.Read;
+                    case 'W': return ProgramHeaderFlag.Write;
+                    case 'E': return ProgramHeaderFlag.Execute;
+                    default: return null as any;
+                }
+            }).filter((f): f is ProgramHeaderFlag => f !== null);
+
+            const programHeader: ProgramHeader = {
+                Type: type,
+                Offset: parseInt(offset, 16),
+                VirtAddr: parseInt(virtAddr, 16),
+                PhysAddr: parseInt(physAddr, 16),
+                FileSiz: parseInt(fileSiz, 16),
+                MemSize: parseInt(memSize, 16),
+                Flg: flagArray,  // Now correctly typed as ProgramHeaderFlag[]
+                Align: parseInt(align, 16),
+                Sections: []     // Will be populated later if needed
+            };
+
+            programHeaders.push(programHeader);
+        } else if (inSecSegMapping) {
+            match = line.match(SECTION_SEGMENT_MAP_REGEX);
+            if (!match) continue
+
+            const [
+                _full, // 0: full match
+                index,
+                sections
+            ] = match;
+
+            if (!sections) {
+                console.log(`Skipping segment-section map for ${index}`);
+                continue;
             }
-        }).filter((f): f is ProgramHeaderFlag => f !== null);
 
-        const programHeader: ProgramHeader = {
-            Type: type,
-            Offset: parseInt(offset, 16),
-            VirtAddr: parseInt(virtAddr, 16),
-            PhysAddr: parseInt(physAddr, 16),
-            FileSiz: parseInt(fileSiz, 16),
-            MemSize: parseInt(memSize, 16),
-            Flg: flagArray,  // Now correctly typed as ProgramHeaderFlag[]
-            Align: parseInt(align, 16),
-            Sections: []     // Will be populated later if needed
-        };
+            console.log(`Seg-Sec Map : ${line}`);
+            programHeaders[parseInt(index, 10)].Sections = sections.trim().split(' ')
 
-        programHeaders.push(programHeader);
+        } else {
+            console.log('Program Header Parsing should not print this.');
+        }
+
     }
 
     if (programHeaders.length === 0) {
