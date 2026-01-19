@@ -70,22 +70,43 @@ export interface ProgramHeader {
 
 //==== Following are Section Header Related Structures ====//
 export enum SectionHeaderType {
-    SHTNull = "NULL",
-    SHTProgbits = "PROGBITS",
-    SHTSymbtab = "SYMTAB",
-    SHTStrtab = "STRTAB",
-    SHTRela = "RELA",
-    SHTHash = "HASH",
-    SHTDynamic = "DYNAMIC",
-    SHTNote = "NOTE",
-    SHTNobits = "NOBITS",
-    SHTRel = "REL",
-    SHTShlib = "SHLIB",
-    SHTDynsym = "DYNSYM",
-    SHTLoproc = "LOPROC",
-    SHTHiproc = "HIPROC",
-    SHTLouser = "LOUSER",
-    SHTHiuser = "HIUSER"
+    SHTNull = "NULL", /* Section header table entry unused */
+    SHTProgbits = "PROGBITS", /* Program data */
+    SHTSymbtab = "SYMTAB", /* Symbol table */
+    SHTStrtab = "STRTAB", /* String table */
+    SHTRela = "RELA", /* Relocation entries with addends */
+    SHTHash = "HASH", /* Symbol hash table */
+    SHTDynamic = "DYNAMIC", /* Dynamic linking information */
+    SHTNote = "NOTE", /* Notes */
+    SHTNobits = "NOBITS", /* Program space with no data (bss) */
+    SHTRel = "REL", /* Relocation entries, no addends */
+    SHTShlib = "SHLIB", /* Reserved */
+    SHTDynsym = "DYNSYM", /* Dynamic linker symbol table */
+    SHTInitArray = "INIT_ARRAY",		/* Array of constructors */
+    SHTFiniArray = "FINI_ARRAY",		/* Array of destructors */
+    SHTPreinitArray = "PREINIT_ARRAY",		/* Array of pre-constructors */
+    SHTGroup = "GROUP",		/* Section group */
+    SHTSymtabShndx = "SYMTAB_SHNDX",		/* Extended section indices */
+    SHTRelr = "RELR",            /* RELR relative relocations */
+    SHTNum = "NUM",		/* Number of defined types.  */
+    SHTLoos = "LOOS",	/* Start OS-specific.  */
+    SHTGnuAttributes = "GNU_ATTRIBUTES",	/* Object attributes.  */
+    SHTGnuHash = "GNU_HASH",	/* GNU-style hash table.  */
+    SHTGnuLiblist = "GNU_LIBLIST",	/* Prelink library list */
+    SHTChecksum = "CHECKSUM",	/* Checksum for DSO content.  */
+    SHTLosunw = "LOSUNW",	/* Sun-specific low bound.  */
+    SHTSunwMove = "SUNW_move",
+    SHTSunwComdat = "SUNW_COMDAT",
+    SHTSunwSyminf = "SUNW_syminf",
+    SHTGnuVerdef = "GNU_verdef",	/* Version definition section.  */
+    SHTGnuVerneed = "GNU_verneed",	/* Version needs section.  */
+    SHTGnuVersym = "GNU_versym",	/* Version symbol table.  */
+    SHTHisunw = "HISUNW",	/* Sun-specific high bound.  */
+    SHTHios = "HIOS",	/* End OS-specific type */
+    SHTLoproc = "LOPROC", /* Start of processor-specific */
+    SHTHiproc = "HIPROC", /* End of processor-specific */
+    SHTLouser = "LOUSER", /* Start of application-specific */
+    SHTHiuser = "HIUSER" /* End of application-specific */
 }
 
 export enum SectionHeaderFlag {
