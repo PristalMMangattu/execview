@@ -31,16 +31,28 @@ export enum ProgramHeaderFlag {
 }
 
 export enum ProgramHeaderType {
-    PTNull = "NULL",
-    PTLoad = "LOAD",
-    PTDynamic = "DYNAMIC",
-    PTInterp = "INTERP",
-    PTNote = "NOTE",
-    PTShlib = "SHLIB",
-    PTPhdr ="PHDR",
-    PTLoProc = "LOPROC",
-    PTHiProc = "HIPROC",
-    PTGnuStack = "GNU_STACK"
+    PTNull = "NULL", /* Program header table entry unused */
+    PTLoad = "LOAD", /* Loadable program segment */
+    PTDynamic = "DYNAMIC", /* Dynamic linking information */
+    PTInterp = "INTERP", /* Program interpreter */
+    PTNote = "NOTE", /* Auxiliary information */
+    PTShlib = "SHLIB", /* Reserved */
+    PTPhdr ="PHDR", /* Entry for header table itself */
+    PTTls = "TLS", /* Thread-local storage segment */
+    PTNum = "NUM",		/* Number of defined types */
+    PTLoos = "LOOS",			/* Start of OS-specific */
+    PTGnuEhFrame = "GNU_EH_FRAME",	/* GCC .eh_frame_hdr segment */
+    PTGnuStack = "GNU_STACK", /* Indicates stack executability */
+    PTGnuRelro = "GNU_RELRO",	/* Read-only after relocation */
+    PTGnuProperty = "GNU_PROPERTY",	/* GNU property */
+    PTGnuSframe = "GNU_SFRAME",	/* SFrame segment.  */
+    PTLosunw = "LOSUNW",
+    PTSunwbss = "SUNWBSS",	/* Sun Specific segment */
+    PTSunwstack = "SUNWSTACK",	/* Stack segment */
+    PTHisunw = "HISUNW",
+    PTHios = "HIOS",	/* End of OS-specific */
+    PTLoProc = "LOPROC", /* Start of processor-specific */
+    PTHiProc = "HIPROC", /* End of processor-specific */
 }
 
 export interface ProgramHeader {
@@ -193,7 +205,7 @@ function getProgramHeaders(vscode: any, program: string, handle: common.ResposeH
     });
 }
 
-const PROGRAM_HEADER_LINE_REGEX = /^(\w+) +([0-9a-f]+) +([0-9a-f]+) +([0-9a-f]+) +([0-9a-f]+) +([0-9a-f]+) +([REW ]+) +([0-9a-f]+)/i;
+const PROGRAM_HEADER_LINE_REGEX = /^\s*([A-Z_]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+(0x[0-9a-f]+)\s+([REW ]+)\s+(0x[0-9a-f]+)\s*$/i;
 
 function programHeaderParser(data: intf.Result, vscode: any) {
     if (data.exitCode) {
