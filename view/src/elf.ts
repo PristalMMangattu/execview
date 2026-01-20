@@ -357,6 +357,7 @@ function programHeaderParser(data: intf.Result, vscode: any) {
     let state: common.State = {} as common.State;
     state.programHeaders = programHeaders;
     common.setStatePartial(vscode, state);
+    common.sendProgramHeaderToWebview(vscode, programHeaders);
     
     console.log(`State updated with ${programHeaders.length} program headers`);
     console.log('State in programHeaderParser:', vscode.getState());
@@ -461,6 +462,7 @@ function sectionHeaderParser(data: intf.Result, vscode: any) {
     let state: common.State = {} as common.State;
     state.sectionHeaders = sectionHeaders;
     common.setStatePartial(vscode, state);
+    common.sendSectionHeaderToWebview(vscode, sectionHeaders);
     
     console.log(`State updated with ${sectionHeaders.length} section headers`);
     console.log('State in sectionHeaderParser:', vscode.getState());

@@ -44,3 +44,25 @@ export class ResposeHandler {
         }
     }
 }
+
+// This function sends section header info for populating activity bar
+export function sendSectionHeaderToWebview(vscode: any, data: elf.SectionHeader[]) {
+    const headers = data.map(obj => obj.Name);
+    const activity = { 
+        header: intf.HeaderType.SECT,
+        data: headers
+    } as intf.ActivityBar;
+
+    const msg = {
+        id: "sec-activity",
+        type: intf.RequestType.ACTIVITY,
+        data: activity
+    } as intf.Request;
+    
+    vscode.postMessage(msg);
+}
+
+// This function sends section header info for populating activity bar
+export function sendProgramHeaderToWebview(vscode:any, data: elf.ProgramHeader[]) {
+
+}

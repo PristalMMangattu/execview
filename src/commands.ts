@@ -78,9 +78,6 @@ async function openFile() {
 
     const webView = view.setupWebview(filePath);
 
-    // Tree view provider is registered only after a file is opened.
-    const provider = new SectionDataProvider();
-    vscode.window.registerTreeDataProvider('section-view', provider);
 }
 
 

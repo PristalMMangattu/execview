@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as fsAsync from 'fs/promises';
 import * as common from './common';
+import * as activity from './activity'
 import * as intf from '../intf/interface';
 import * as path from 'path';
 import { getLogger} from './logger';
@@ -76,7 +77,7 @@ async function messageHandler(message: intf.Request) {
             response = await initReqHandler(message.id);
             webviewPanel?.webview.postMessage(response);
         } else if (message.type === intf.RequestType.ACTIVITY) {
-        
+            await activity.populateActivityBar(message.data as intf.ActivityBar);
         } else {
             throw new Error('Unknow request type.');
         }

@@ -60,6 +60,7 @@ function replaceParagraphById(
 }
 
 function initialize() {
+    // Send init message.
     responseHandler.registerHandler("init", (data: string) => {
         console.log(`Program : ${data}`);
         let state: common.State = {} as common.State;
