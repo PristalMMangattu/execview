@@ -1,8 +1,21 @@
 // Handle Activity Bar Events.
 import * as vscode from 'vscode';
 import * as intf from '../intf/interface';
+import { getLogger} from './logger';
+import { Logger } from 'winston';
+
+let logger: Logger;
+
+(async () => {
+    logger = await getLogger();
+})();
 
 export class SegmentDataProvider implements vscode.TreeDataProvider<string> {
+  private segments: string[];
+
+  constructor(segs: string[]) {
+    this.segments = segs;
+  }
   getTreeItem(element: string): vscode.TreeItem {
     return {
       label: element,
@@ -11,7 +24,7 @@ export class SegmentDataProvider implements vscode.TreeDataProvider<string> {
   }
 
   getChildren(): string[] {
-    return ['Item 1', 'Item 2', 'Item 3'];
+    return this.segments;
   }
 }
 
@@ -42,5 +55,10 @@ export async function populateActivityBar(msg: intf.ActivityBar) {
       if (msg.header === intf.HeaderType.SECT) {
         const provider = new SectionDataProvider(msg.data);
         vscode.window.registerTreeDataProvider('section-view', provider);
+      } else if (msg.header === intf.HeaderType.PROG) {
+        const provider = new SegmentDataProvider(msg.data);
+        vscode.window.registerTreeDataProvider('segment-view', provider);
+      } else {
+
       }
 }

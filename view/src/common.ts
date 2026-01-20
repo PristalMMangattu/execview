@@ -58,11 +58,23 @@ export function sendSectionHeaderToWebview(vscode: any, data: elf.SectionHeader[
         type: intf.RequestType.ACTIVITY,
         data: activity
     } as intf.Request;
-    
+
     vscode.postMessage(msg);
 }
 
 // This function sends section header info for populating activity bar
 export function sendProgramHeaderToWebview(vscode:any, data: elf.ProgramHeader[]) {
+    const headers = data.map(obj => obj.Type);
+    const activity = { 
+        header: intf.HeaderType.PROG,
+        data: headers
+    } as intf.ActivityBar;
 
+    const msg = {
+        id: "sec-activity",
+        type: intf.RequestType.ACTIVITY,
+        data: activity
+    } as intf.Request;
+    
+    vscode.postMessage(msg);
 }
