@@ -3,9 +3,9 @@
 // Webview takes help of extension to run local programs.
 
 export enum RequestType {
-    INIT,
-    ACTIVITY,
-    EXECUTE,
+    INIT, // Webview => Extension
+    ACTIVITY, // Webview => Extension
+    EXECUTE, // Webview => Extension
 }
 
 export interface Command {
@@ -15,8 +15,8 @@ export interface Command {
 }
 
 export interface Request {
-    id: string,
-    type: RequestType,
+    id: string,            // This is an identifier for webview to identify request-response pair, entension sends back Response with same id.
+    type: RequestType,     // This is used to indicate to extension, what to do.
     data?: Command | ActivityBar | string | undefined // This can be anything depending on request type.
 }
 

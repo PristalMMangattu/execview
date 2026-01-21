@@ -133,11 +133,16 @@ export async function renderWebview(): Promise<vscode.WebviewPanel> {
     return webviewPanel;
 }
 
-export async function setupWebview(prog: string): Promise<vscode.WebviewPanel | null> {
+export async function setupWebview(prog: string): Promise<vscode.WebviewPanel> {
     programUnderObservation = prog;
     if (webviewPanel) {
         logger.info('Webview Panel already exists..');
         webviewPanel.reveal(vscode.ViewColumn.Active);
+
+        // init response is sent even without init request.
+        // because here a different file is selected and webview need to reinitilize.
+        const response = await initReqHandler('init');
+        webviewPanel?.webview.postMessage(response);
         return webviewPanel;
     }
     try {
@@ -146,7 +151,7 @@ export async function setupWebview(prog: string): Promise<vscode.WebviewPanel | 
 
         if (!webviewPanel) {
             logger.error('Failed to render webview.');
-            return null;
+            throw new Error('Failed to render webview.')
         }
 
         // Store the event listener
@@ -165,7 +170,7 @@ export async function setupWebview(prog: string): Promise<vscode.WebviewPanel | 
 
     } catch(error) {
         logger.error(`Webview setup error : ${error}`);
-        return null;
+        throw new Error(`Webview setup error : ${error}`)
     }
 
     return webviewPanel;

@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as cmds from './commands';
 import * as common from './common';
+import * as activity from './activity'
 import { getLogger, updateLoggerLevel} from './logger';
 import { Logger } from 'winston';
 

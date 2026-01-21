@@ -72,12 +72,12 @@ async function openFile() {
             vscode.window.showErrorMessage(`'${filePath}' is not a valid ELF file.`);
             return null;
         }
+
+        const webView = await view.setupWebview(filePath);
+
     } catch (error) {
         vscode.window.showErrorMessage(String(error));
     }
-
-    const webView = view.setupWebview(filePath);
-
 }
 
 
