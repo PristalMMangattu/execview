@@ -4,7 +4,6 @@ import { Logger } from 'winston';
 import { OutputChannelTransport } from 'winston-transport-vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { log } from 'console';
 
 
 let logger: Logger | undefined;

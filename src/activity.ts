@@ -3,7 +3,6 @@ import * as vscode from 'vscode';
 import * as intf from '../intf/interface';
 import { getLogger} from './logger';
 import { Logger } from 'winston';
-import { UnevaluatedItemsError } from 'ajv/dist/vocabularies/unevaluated/unevaluatedItems';
 
 let logger: Logger;
 

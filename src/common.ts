@@ -1,4 +1,4 @@
-import { exec, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import * as vscode from 'vscode';
 import * as intf from '../intf/interface';
 import { getLogger} from './logger';

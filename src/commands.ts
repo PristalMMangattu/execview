@@ -1,7 +1,5 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as fsAsync from 'fs/promises';
-import { SectionDataProvider, SegmentDataProvider } from './activity'
 import * as common from './common';
 import * as view from './webview';
 import { getLogger} from './logger';
