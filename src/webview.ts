@@ -126,7 +126,13 @@ export async function renderWebview(): Promise<vscode.WebviewPanel> {
         (match, p1) => {
             console.log('Captured:', p1);  // Should log: ./app.js
             return `src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(baseUri, p1))}"`;
+        }).replace(
+        /href=["'](\.\/[^"']*)["']/g,
+        (match, p1) => {
+            console.log('Captured href:', p1);
+            return `href="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(baseUri, p1))}"`;
         });
+
 
     webviewPanel.webview.html = html;
 
