@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basic Visualization Page</title>
     <link rel="stylesheet" href="./style.css">
+    <style>
+        .enlarged { font-size: 1.5em; font-weight: bold; }
+    </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>My Basic Web Page with Visualization</h1>
-        <p>This page uses an HTML canvas element to display a simple visualization.</p>
-        <p id="readelf"></p>
+        <h1>
+            <span class="enlarged">E</span>xecutable &amp; <span class="enlarged">L</span>inkable <span class="enlarged">F</span>ormat
+        </h1>
+        <nav class="sidebar">
+            <vscode-button class="btn active" onclick="setActive(this)">📁 Files</vscode-button>
+            <vscode-button class="btn" onclick="setActive(this)">🔍 Search</vscode-button>
+            <vscode-button class="btn" onclick="setActive(this)">⚙️ Settings</vscode-button>
+            <vscode-button class="btn" onclick="setActive(this)">📊 Debug</vscode-button>
+            <vscode-button class="btn" onclick="setActive(this)">🔌 ELF Viewer</vscode-button>
+            <vscode-button class="btn" onclick="setActive(this)">💾 Export</vscode-button>
+        </nav>
         <!-- The HTML canvas element for drawing -->
         <div id="visualization"></div>
     </div>
 
     <script src="./app.js" type="module"></script>
+    <script src="./vscode-elements/bundled.js" type="module"></script>
 
 </body>
 </html>

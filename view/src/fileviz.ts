@@ -7,18 +7,26 @@
 import Konva from 'konva';
 
 // Pastel color palette for visual appeal
+
 const PASTEL_COLORS = [
-  '#FFB3BA', // Pastel Red
-  '#D5AAFF', // Pastel Lavender
-  '#FFFFBA', // Pastel Yellow
-  '#FFCCCB', // Pastel Light Red
-  '#FFE5BA', // Pastel Peach
-  '#FFB3D9', // Pastel Pink
-  '#E0BBE4', // Pastel Purple
-  '#BAFFC9', // Pastel Mint
-  '#FFBABA', // Pastel Coral
-  '#BAE1FF', // Pastel Blue
+  '#BAE1FF', // Pastel Blue (cool start)
+  '#FFB3BA', // Pastel Red (warm contrast)
+  '#BAFFC9', // Pastel Mint (cool green)
+  '#FFE5BA', // Pastel Peach (warm orange)
+  '#D5AAFF', // Pastel Lavender (cool purple)
+  '#FFCCCB', // Pastel Light Red (warm pink)
+  '#84DCC6', // Pastel Teal (new cool cyan, high contrast to reds)
+  '#FFBABA', // Pastel Coral (warm)
+  '#E0BBE4', // Pastel Purple (cool)
+  '#FFFFBA', // Pastel Yellow (warm)
+  '#B5E48C', // Pastel Lime (new cool green, contrasts yellow)
+  '#FFB3D9', // Pastel Pink (warm)
+  '#A5F2F3', // Pastel Aquamarine (new cool, contrasts pinks)
+  '#FFDFBA', // Pastel Apricot (new warm orange)
+  '#D4F4DD', // Pastel Sage (new muted cool green)
+  '#FFF3E0', // Pastel Cream Orange (new warm neutral close)
 ];
+
 
 interface VisualizationConfig {
   containerSelector: string;
@@ -203,7 +211,7 @@ class ArrayVisualizer {
     const title = new Konva.Text({
       x: this.stage.width() / 2,
       y: 20,
-      text: 'Array Difference Visualization',
+      text: 'File Overview',
       fontSize: 20,
       fontFamily: 'Arial',
       fontStyle: 'bold',
