@@ -16,12 +16,10 @@
             <span class="enlarged">E</span>xecutable &amp; <span class="enlarged">L</span>inkable <span class="enlarged">F</span>ormat
         </h1>
         <nav class="sidebar">
-            <vscode-button class="btn active" onclick="setActive(this)">📁 Files</vscode-button>
-            <vscode-button class="btn" onclick="setActive(this)">🔍 Search</vscode-button>
-            <vscode-button class="btn" onclick="setActive(this)">⚙️ Settings</vscode-button>
-            <vscode-button class="btn" onclick="setActive(this)">📊 Debug</vscode-button>
-            <vscode-button class="btn" onclick="setActive(this)">🔌 ELF Viewer</vscode-button>
-            <vscode-button class="btn" onclick="setActive(this)">💾 Export</vscode-button>
+            <vscode-button class="btn" id="Overview">📁 Overview</vscode-button>
+            <vscode-button class="btn" id="Sections">📊 Sections</vscode-button>
+            <vscode-button class="btn" id="Segments">⚙️ Segments</vscode-button>
+            <vscode-button class="btn" id="Symbols">🔍 Symbols &amp Strings </vscode-button>
         </nav>
         <!-- The HTML canvas element for drawing -->
         <div id="visualization"></div>
