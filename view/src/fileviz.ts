@@ -9,15 +9,15 @@ import Konva from 'konva';
 // Pastel color palette for visual appeal
 const PASTEL_COLORS = [
   '#FFB3BA', // Pastel Red
+  '#D5AAFF', // Pastel Lavender
+  '#FFFFBA', // Pastel Yellow
   '#FFCCCB', // Pastel Light Red
-  '#FFBABA', // Pastel Coral
+  '#FFE5BA', // Pastel Peach
   '#FFB3D9', // Pastel Pink
   '#E0BBE4', // Pastel Purple
-  '#D5AAFF', // Pastel Lavender
   '#BAFFC9', // Pastel Mint
+  '#FFBABA', // Pastel Coral
   '#BAE1FF', // Pastel Blue
-  '#FFFFBA', // Pastel Yellow
-  '#FFE5BA', // Pastel Peach
 ];
 
 interface VisualizationConfig {
@@ -36,6 +36,10 @@ interface Box {
   height: number;
   yOffset: number;
   color: string;
+}
+
+export function myFunction() {
+
 }
 
 /**
@@ -122,51 +126,6 @@ class ArrayVisualizer {
   }
 
   /**
-   * Draw the y-axis with labels
-   */
-  private drawYAxis(): void {
-    const axisX = this.config.paddingX - 20;
-    const axisStartY = this.config.paddingY;
-    const totalHeight = this.boxes.reduce((sum, box) => sum + box.height, 0);
-    const axisEndY = axisStartY + totalHeight;
-
-    // Y-axis line
-    const axisLine = new Konva.Line({
-      points: [axisX, axisStartY, axisX, axisEndY],
-      stroke: '#333',
-      strokeWidth: 2,
-    });
-    this.layer.add(axisLine);
-
-    // Y-axis labels at each boundary
-    let currentY = axisStartY;
-    for (let i = 0; i <= this.numbers.length; i++) {
-      const label = new Konva.Text({
-        x: axisX - 40,
-        y: currentY - 8,
-        text: this.numbers[i]?.toString() || this.numbers[0].toString(),
-        fontSize: 12,
-        fontFamily: 'Arial',
-        fill: '#333',
-        align: 'right',
-      });
-      this.layer.add(label);
-
-      // Small tick mark
-      const tick = new Konva.Line({
-        points: [axisX - 5, currentY, axisX, currentY],
-        stroke: '#999',
-        strokeWidth: 1,
-      });
-      this.layer.add(tick);
-
-      if (i < this.numbers.length - 1) {
-        currentY += this.boxes[i].height;
-      }
-    }
-  }
-
-  /**
    * Draw stacked boxes
    */
   private drawBoxes(): void {
@@ -238,115 +197,6 @@ class ArrayVisualizer {
   }
 
   /**
-   * Draw arrows showing transitions between boxes
-   */
-  private drawArrows(): void {
-    if (!this.config.enableArrows || this.rectangles.length < 2) {
-      return;
-    }
-
-    const arrowOffsetX = this.config.boxWidth + 30;
-
-    for (let i = 0; i < this.rectangles.length - 1; i++) {
-      const currentBox = this.rectangles[i];
-      const nextBox = this.rectangles[i + 1];
-
-      const startX = currentBox.x() + this.config.boxWidth;
-      const startY = currentBox.y() + currentBox.height();
-
-      const endX = nextBox.x();
-      const endY = nextBox.y();
-
-      // Draw curved arrow
-      this.drawCurvedArrow(startX, startY, endX, endY, '#999', 2);
-    }
-  }
-
-  /**
-   * Draw a curved arrow between two points
-   */
-  private drawCurvedArrow(
-    fromX: number,
-    fromY: number,
-    toX: number,
-    toY: number,
-    color: string,
-    thickness: number
-  ): void {
-    const controlX = (fromX + toX) / 2 + 20;
-    const controlY = (fromY + toY) / 2;
-
-    // Draw curved line using quadratic bezier
-    const curve = new Konva.Line({
-      points: this.generateBezierPoints(fromX, fromY, controlX, controlY, toX, toY),
-      stroke: color,
-      strokeWidth: thickness,
-      lineCap: 'round',
-      lineJoin: 'round',
-    });
-    this.layer.add(curve);
-
-    // Draw arrowhead
-    this.drawArrowhead(toX, toY, controlX, controlY, color);
-  }
-
-  /**
-   * Generate points for bezier curve
-   */
-  private generateBezierPoints(
-    startX: number,
-    startY: number,
-    controlX: number,
-    controlY: number,
-    endX: number,
-    endY: number,
-    segments: number = 20
-  ): number[] {
-    const points: number[] = [];
-
-    for (let t = 0; t <= 1; t += 1 / segments) {
-      const x =
-        Math.pow(1 - t, 2) * startX +
-        2 * (1 - t) * t * controlX +
-        Math.pow(t, 2) * endX;
-      const y =
-        Math.pow(1 - t, 2) * startY +
-        2 * (1 - t) * t * controlY +
-        Math.pow(t, 2) * endY;
-
-      points.push(x, y);
-    }
-
-    return points;
-  }
-
-  /**
-   * Draw arrowhead at the end point
-   */
-  private drawArrowhead(toX: number, toY: number, controlX: number, controlY: number, color: string): void {
-    const angle = Math.atan2(toY - controlY, toX - controlX);
-    const arrowSize = 10;
-
-    const p1X = toX - arrowSize * Math.cos(angle - Math.PI / 6);
-    const p1Y = toY - arrowSize * Math.sin(angle - Math.PI / 6);
-    const p2X = toX - arrowSize * Math.cos(angle + Math.PI / 6);
-    const p2Y = toY - arrowSize * Math.sin(angle + Math.PI / 6);
-
-    const arrowhead = new Konva.Shape({
-      sceneFunc: (context) => {
-        context.beginPath();
-        context.moveTo(toX, toY);
-        context.lineTo(p1X, p1Y);
-        context.lineTo(p2X, p2Y);
-        context.closePath();
-        context.fillStrokeShape(this as any);
-      },
-      fill: color,
-    });
-    this.layer.add(arrowhead);
-  }
-
-  /**
    * Draw title and legend
    */
   private drawLabels(): void {
@@ -411,9 +261,7 @@ class ArrayVisualizer {
    */
   private initialize(): void {
     this.calculateBoxes();
-    this.drawYAxis();
     this.drawBoxes();
-    this.drawArrows();
     this.drawLabels();
     this.layer.draw();
   }
