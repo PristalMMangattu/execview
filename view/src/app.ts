@@ -1,8 +1,8 @@
 import * as intf from '../../intf/interface';
 import * as elf from './elf';
 import * as common from './common';
-import * as fileviz from './fileviz';
 import * as viz from './viz';
+import * as def from './define';
 //import "vscode-webview"
 
 // Declare the acquireVsCodeApi function.
@@ -11,19 +11,6 @@ declare function acquireVsCodeApi(): any;
 const vscode = acquireVsCodeApi();
 const responseHandler = new common.ResposeHandler();
 let gElf: elf.Elf;
-
-// Get the canvas element and its 2D rendering context
-// const element = document.getElementById('myCanvas');
-
-const visualizer = new fileviz.ArrayVisualizer({
-  containerSelector: '#visualization',
-  numbers: [2, 85, 96, 500],
-  boxWidth: 150,
-  scaleFactor: 1,
-  enableArrows: true,
-  enableAnimations: true,
-});
-
 
 // Function to replace paragraph content by ID
 function replaceParagraphById(
@@ -40,6 +27,11 @@ function replaceParagraphById(
   paragraph.textContent = newContent;
   console.log(`Paragraph "${id}" content replaced successfully`);
   return true;
+}
+
+function initialView(): void {
+  const overviewBtn = document.getElementById('Overview') as HTMLButtonElement;
+  overviewBtn.click();
 }
 
 function initialize() {
@@ -63,10 +55,7 @@ function initialize() {
 }
 // Usage examples
 function main() {
-  // Replace paragraph with specific ID
-  replaceParagraphById('readelf', 'This data should be provided by the extension.');
   initialize();
-
 }
 
 // Run when DOM is ready
@@ -78,10 +67,19 @@ document.addEventListener('click', async (event: MouseEvent) => {
   if (btn.classList.contains('btn')) {
     const id = btn.id;
     const action = viz.actionMap[id];
-    action?.();
-
+    action?.(vscode);
   }
 });
+
+// Check if all the required data is received from webview to display the contents
+const intervalId = setInterval(() => {
+  console.log("Checking if data is received.");
+  const state = vscode.getState() as common.State;
+  if (state.elfHeader && state.programHeaders.length > 0 && state.sectionHeaders.length > 0) {
+    initialView();
+    clearInterval(intervalId);
+  }
+}, def.CHECK_STATE_INTERVAL);
 
 
 // Add event listener for received messages

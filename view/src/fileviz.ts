@@ -3,52 +3,26 @@
  * Visualizes an array of sorted numbers as stacked boxes
  * where height represents the difference between consecutive numbers
  */
-
+import * as def from './define';
 import Konva from 'konva';
-
-// Pastel color palette for visual appeal
-
-const PASTEL_COLORS = [
-  '#BAE1FF', // Pastel Blue (cool start)
-  '#FFB3BA', // Pastel Red (warm contrast)
-  '#BAFFC9', // Pastel Mint (cool green)
-  '#FFE5BA', // Pastel Peach (warm orange)
-  '#D5AAFF', // Pastel Lavender (cool purple)
-  '#FFCCCB', // Pastel Light Red (warm pink)
-  '#84DCC6', // Pastel Teal (new cool cyan, high contrast to reds)
-  '#FFBABA', // Pastel Coral (warm)
-  '#E0BBE4', // Pastel Purple (cool)
-  '#FFFFBA', // Pastel Yellow (warm)
-  '#B5E48C', // Pastel Lime (new cool green, contrasts yellow)
-  '#FFB3D9', // Pastel Pink (warm)
-  '#A5F2F3', // Pastel Aquamarine (new cool, contrasts pinks)
-  '#FFDFBA', // Pastel Apricot (new warm orange)
-  '#D4F4DD', // Pastel Sage (new muted cool green)
-  '#FFF3E0', // Pastel Cream Orange (new warm neutral close)
-];
 
 
 interface VisualizationConfig {
   containerSelector: string;
-  numbers: number[];
+  info: def.FileArea[];
   boxWidth?: number;
   scaleFactor?: number;
   paddingX?: number;
   paddingY?: number;
-  enableArrows?: boolean;
-  enableAnimations?: boolean;
 }
 
 interface Box {
-  value: number;
+  value: string;
   height: number;
   yOffset: number;
   color: string;
 }
 
-export function myFunction() {
-
-}
 
 /**
  * ArrayVisualizer - Main visualization class
@@ -56,57 +30,20 @@ export function myFunction() {
 class ArrayVisualizer {
   private stage: Konva.Stage;
   private layer: Konva.Layer;
-  private numbers: number[];
-  private config: Required<VisualizationConfig>;
   private boxes: Box[] = [];
   private rectangles: Konva.Rect[] = [];
   private labels: Konva.Text[] = [];
+  private info: def.FileArea[] = [];
 
-  constructor(config: VisualizationConfig) {
+  constructor(stage: Konva.Stage, info: def.FileArea[]) {
     // Validate input
-    if (!config.numbers || config.numbers.length === 0) {
+    if (!info || info.length === 0) {
       throw new Error('Numbers array must not be empty');
     }
-
-    // Verify array is sorted
-    for (let i = 1; i < config.numbers.length; i++) {
-      if (config.numbers[i] < config.numbers[i - 1]) {
-        throw new Error('Numbers array must be in increasing order');
-      }
-    }
-
-    // Set defaults
-    this.config = {
-      containerSelector: config.containerSelector,
-      numbers: config.numbers,
-      boxWidth: config.boxWidth ?? 60,
-      scaleFactor: config.scaleFactor ?? 15,
-      paddingX: config.paddingX ?? 80,
-      paddingY: config.paddingY ?? 60,
-      enableArrows: config.enableArrows ?? true,
-      enableAnimations: config.enableAnimations ?? true,
-    };
-
-    this.numbers = config.numbers;
-
-    // Initialize Konva stage
-    const container = document.querySelector(this.config.containerSelector) as HTMLElement;
-    if (!container) {
-      throw new Error(`Container not found: ${this.config.containerSelector}`);
-    }
-
-    const width = container.clientWidth || 1200;
-    const height = container.clientHeight || 800;
-
-    this.stage = new Konva.Stage({
-      container: this.config.containerSelector,
-      width,
-      height,
-    });
-
+    this.stage = stage;
+    this.info = info;
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
-
     this.initialize();
   }
 
@@ -115,21 +52,20 @@ class ArrayVisualizer {
    */
   private calculateBoxes(): void {
     this.boxes = [];
-    let cumulativeHeight = 0;
 
-    for (let i = 0; i < this.numbers.length - 1; i++) {
-      const diff = this.numbers[i + 1] - this.numbers[i];
-      const height = diff * this.config.scaleFactor;
-      const color = PASTEL_COLORS[i % PASTEL_COLORS.length];
+    for (let i = 0; i < this.info.length - 1; i++) {
+      const color = def.PASTEL_COLORS[i % def.PASTEL_COLORS.length];
+      const height = this.info[i].size * def.FV_SCALE_FACTOR;
+      console.log(`Height for box ${i} : ${height}`);
+      const yOffset = def.FV_TOP_MARGINE + this.info[i].addr * def.FV_SCALE_FACTOR;
 
       this.boxes.push({
-        value: diff,
-        height,
-        yOffset: cumulativeHeight,
+        value: this.info[i].name,
+        height: this.info[i].size * def.FV_SCALE_FACTOR,
+        yOffset: def.FV_TOP_MARGINE + this.info[i].addr * def.FV_SCALE_FACTOR,
         color,
       });
 
-      cumulativeHeight += height;
     }
   }
 
@@ -140,13 +76,13 @@ class ArrayVisualizer {
     let boxIndex = 0;
 
     for (const box of this.boxes) {
-      const x = this.config.paddingX;
-      const y = this.config.paddingY + box.yOffset;
+      const x = def.FV_TOP_MARGINE;
+      const y = def.FV_LEFT_MARGINE + box.yOffset;
 
       const rect = new Konva.Rect({
         x,
         y,
-        width: this.config.boxWidth,
+        width: def.FV_BOX_WIDTH,
         height: box.height,
         fill: box.color,
         stroke: '#555',
@@ -174,7 +110,7 @@ class ArrayVisualizer {
       this.rectangles.push(rect);
 
       // Animate entrance if enabled
-      if (this.config.enableAnimations) {
+      if (def.FV_ANIMATE) {
         rect.height(0);
         rect.y(y + box.height);
         const anim = new Konva.Animation((frame) => {
@@ -187,7 +123,7 @@ class ArrayVisualizer {
 
       // Add label showing the difference value
       const label = new Konva.Text({
-        x: x + this.config.boxWidth / 2,
+        x: x + def.FV_BOX_WIDTH / 2,
         y: y + box.height / 2,
         text: `+${box.value}`,
         fontSize: 14,
@@ -223,7 +159,7 @@ class ArrayVisualizer {
 
     // Legend
     let legendY = 50;
-    const legendX = this.config.paddingX + this.config.boxWidth + 60;
+    const legendX = def.FV_LEFT_MARGINE + def.FV_BOX_WIDTH + 60;
 
     const legendTitle = new Konva.Text({
       x: legendX,
@@ -253,7 +189,7 @@ class ArrayVisualizer {
       const legendText = new Konva.Text({
         x: legendX + 20,
         y: legendY,
-        text: `${this.numbers[i]} → ${this.numbers[i + 1]} (diff: +${box.value})`,
+        text: `${this.info[i].addr} →  ${this.info[i].addr} +  ${this.info[i].size} (${this.info[i].name})`,
         fontSize: 11,
         fontFamily: 'Arial',
         fill: '#333',
@@ -277,15 +213,7 @@ class ArrayVisualizer {
   /**
    * Update with new data
    */
-  public updateData(numbers: number[]): void {
-    // Verify array is sorted
-    for (let i = 1; i < numbers.length; i++) {
-      if (numbers[i] < numbers[i - 1]) {
-        throw new Error('Numbers array must be in increasing order');
-      }
-    }
-
-    this.numbers = numbers;
+  public updateData(info: def.FileArea[]): void {
     this.layer.destroyChildren();
     this.rectangles = [];
     this.labels = [];
@@ -316,4 +244,4 @@ class ArrayVisualizer {
 }
 
 // Export for use in other modules
-export { ArrayVisualizer, VisualizationConfig, PASTEL_COLORS };
+export { ArrayVisualizer, VisualizationConfig };
