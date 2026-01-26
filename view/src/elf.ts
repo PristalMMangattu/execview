@@ -117,17 +117,17 @@ export enum SectionHeaderFlag {
 }
 
 export interface SectionHeader {
-  Nr: number, // Number (This is not part of Section Header)
-  Name: string,
-  Type: SectionHeaderType,
-  Address: number,
-  Offset: number,
-  Size: number,
-  EntSize: number,
-  Flags: SectionHeaderFlag[],
+  Nr: number, // Number (This is not part of Section Header).
+  Name: string, // Section name (string tbl index).
+  Type: SectionHeaderType, // Section Type.
+  Address: number, // Section of virutal addr at execution.
+  Offset: number, // Section file offset.
+  Size: number, // Section size in bytes.
+  EntSize: number, // Entry size if section holds table.
+  Flags: SectionHeaderFlag[], // Section flags.
   Link: number, // Link to another section.
   Info: number, // Holds extra information.
-  Align: number
+  Align: number // Section alignment.
 }
 
 

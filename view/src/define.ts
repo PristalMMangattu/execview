@@ -28,13 +28,17 @@ export const PASTEL_COLORS = [
   '#FFF3E0', // Pastel Cream Orange (new warm neutral close)
 ];
 
-/* Interfaces for fileviz */
+/*========== PARAMETERS FOR DISPLAY PORT =============*/
+export const FV_TOP_MARGINE: number = 80; // Top margin for vizuals
+export const FV_BOTTOM_MARGINE: number = 80; // Top margin for vizuals
+
+
+/*========== PARAMETERS FOR FILE OVERVIEW =============*/
 
 /* Config for file view */
-export const FV_BOX_WIDTH: number = 100; // Width of each boxs
+export const FV_BOX_WIDTH: number = 300; // Width of each boxs
 export const FV_MINIMUM_SIZE: number = 100; // if size is less than this then to display the name properly this will be considered.
 export const FV_LEFT_MARGINE: number = 80; // Left margin for vizuals
-export const FV_TOP_MARGINE: number = 80; // Top margin for vizuals
 export const FV_SCALE_FACTOR: number = 0.5; // The view will be scaled by this factor.
 export const FV_ANIMATE: boolean = true;
 

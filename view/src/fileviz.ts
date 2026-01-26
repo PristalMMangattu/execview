@@ -25,13 +25,13 @@ interface Box {
 
 
 /**
- * ArrayVisualizer - Main visualization class
+ * FileOverview - Main visualization class
  */
-class ArrayVisualizer {
+class FileOverview {
   private stage: Konva.Stage;
   private layer: Konva.Layer;
   private boxes: Box[] = [];
-  private rectangles: Konva.Rect[] = [];
+  private rectangles: Konva.Group[] = [];
   private labels: Konva.Text[] = [];
   private info: def.FileArea[] = [];
 
@@ -53,16 +53,13 @@ class ArrayVisualizer {
   private calculateBoxes(): void {
     this.boxes = [];
 
-    for (let i = 0; i < this.info.length - 1; i++) {
+    for (let i = 0; i < this.info.length; i++) {
       const color = def.PASTEL_COLORS[i % def.PASTEL_COLORS.length];
-      const height = this.info[i].size * def.FV_SCALE_FACTOR;
-      console.log(`Height for box ${i} : ${height}`);
-      const yOffset = def.FV_TOP_MARGINE + this.info[i].addr * def.FV_SCALE_FACTOR;
 
       this.boxes.push({
         value: this.info[i].name,
-        height: this.info[i].size * def.FV_SCALE_FACTOR,
-        yOffset: def.FV_TOP_MARGINE + this.info[i].addr * def.FV_SCALE_FACTOR,
+        height: 20,
+        yOffset: def.FV_TOP_MARGINE + 20 * i,
         color,
       });
 
@@ -73,15 +70,18 @@ class ArrayVisualizer {
    * Draw stacked boxes
    */
   private drawBoxes(): void {
-    let boxIndex = 0;
-
     for (const box of this.boxes) {
-      const x = def.FV_TOP_MARGINE;
-      const y = def.FV_LEFT_MARGINE + box.yOffset;
+      const x = def.FV_LEFT_MARGINE;
+      const y = box.yOffset;
 
-      const rect = new Konva.Rect({
-        x,
-        y,
+      const rectGroup = new Konva.Group({
+        x: x,
+        y: y,
+        width: def.FV_BOX_WIDTH,
+        height: box.height,
+      });
+
+      rectGroup.add(new Konva.Rect({
         width: def.FV_BOX_WIDTH,
         height: box.height,
         fill: box.color,
@@ -91,52 +91,21 @@ class ArrayVisualizer {
         shadowBlur: 5,
         shadowOffset: { x: 2, y: 2 },
         shadowOpacity: 0.5,
-      });
+      }));
 
-      // Add hover effect
-      rect.on('mouseenter', () => {
-        rect.shadowBlur(10);
-        rect.shadowOpacity(0.8);
-        this.stage.batchDraw();
-      });
-
-      rect.on('mouseleave', () => {
-        rect.shadowBlur(5);
-        rect.shadowOpacity(0.5);
-        this.stage.batchDraw();
-      });
-
-      this.layer.add(rect);
-      this.rectangles.push(rect);
-
-      // Animate entrance if enabled
-      if (def.FV_ANIMATE) {
-        rect.height(0);
-        rect.y(y + box.height);
-        const anim = new Konva.Animation((frame) => {
-          const progress = Math.min((frame?.time || 0) / 300, 1); // 300ms animation
-          rect.height(box.height * progress);
-          rect.y(y + box.height * (1 - progress));
-        }, this.layer);
-        anim.start();
-      }
-
-      // Add label showing the difference value
-      const label = new Konva.Text({
-        x: x + def.FV_BOX_WIDTH / 2,
-        y: y + box.height / 2,
-        text: `+${box.value}`,
+      rectGroup.add(new Konva.Text({
+        text: box.value,
         fontSize: 14,
         fontFamily: 'Arial',
         fontStyle: 'bold',
         fill: '#333',
-        align: 'center',
+        align: 'left',
+        padding: 2,
         verticalAlign: 'middle',
-      });
-      this.layer.add(label);
-      this.labels.push(label);
+      }));
 
-      boxIndex++;
+      this.layer.add(rectGroup);
+      this.rectangles.push(rectGroup);
     }
   }
 
@@ -244,4 +213,4 @@ class ArrayVisualizer {
 }
 
 // Export for use in other modules
-export { ArrayVisualizer, VisualizationConfig };
+export { FileOverview, VisualizationConfig };
