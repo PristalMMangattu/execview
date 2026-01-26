@@ -3,6 +3,7 @@ import * as elf from './elf';
 
 export interface State {
   program: string,
+  size: number,
   interpreter: string,
   elfHeader: elf.ElfHeader,
   programHeaders: elf.ProgramHeader[],
@@ -10,7 +11,7 @@ export interface State {
 }
 
 export function setStatePartial(vscode: any, partial: Partial<State>): void {
-  const current = (vscode.getState() as State) || { program: '', interpreter: '', elfHeader: {} as elf.ElfHeader, programHeaders: [] as elf.ProgramHeader[], sectionHeaders: [] as elf.SectionHeader[] };
+  const current = (vscode.getState() as State) || { program: '', size: 0, interpreter: '', elfHeader: {} as elf.ElfHeader, programHeaders: [] as elf.ProgramHeader[], sectionHeaders: [] as elf.SectionHeader[] };
   vscode.setState({ ...current, ...partial } as State);
 }
 
@@ -75,4 +76,46 @@ export function sendProgramHeaderToWebview(vscode: any, data: elf.ProgramHeader[
   } as intf.Request;
 
   vscode.postMessage(msg);
+}
+
+function wcResponseHandler(data: intf.Result, vscode: any) {
+  if (data.exitCode) {
+    console.log(`'wc -c <prog>', exit code is ${data.exitCode} (non-zero)`);
+    return;
+  }
+
+  if (!data.stdout) {
+    console.log(`'wc -c <prog>', stdout is empty.`);
+    return;
+  }
+
+  const out = data.stdout;
+  const matches = out.match(/^\s*([\d]+)\s+([\S]+)\s*$/);
+  if (!matches) {
+    console.log(`'wc' output is not proper.`);
+    return;
+  }
+
+  const sizeMatch = matches[1];
+  const size = parseInt(sizeMatch, 10);
+  console.log(`Size of ${matches[2]} is ${matches[1]}`);
+  // Update state with size information. 
+  let state: State = {} as State;
+  state.size = size;
+  setStatePartial(vscode, state);
+  console.log('State in wcResponseHandler:', vscode.getState());
+}
+
+export function getFileSize(vscode: any, program: string, handler: ResposeHandler) {
+  // Sends 'wc -c <file>' command to get the filesSize 
+  console.log('getFileSize called.');
+  handler.registerHandler("wc", (d) => wcResponseHandler(d, vscode));
+  vscode.postMessage({
+    id: "wc",
+    type: intf.RequestType.EXECUTE,
+    data: {
+      prog: "wc",
+      args: ["-c", `${program}`],
+    }
+  });
 }

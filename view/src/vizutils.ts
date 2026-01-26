@@ -2,94 +2,17 @@
  * Advanced Extensions & Utilities
  * Additional features and utilities for enhanced visualization
  */
+import * as def from './define';
 
-import Konva from 'konva';
-import { ArrayVisualizer, VisualizationConfig, PASTEL_COLORS } from './fileviz';
-
-/**
- * Extended visualizer with additional features
- */
-class AdvancedArrayVisualizer extends ArrayVisualizer {
-  private gridLines: Konva.Line[] = [];
-  private isGridVisible: boolean = false;
-
-  /**
-   * Toggle grid overlay
-   */
-  public toggleGrid(): void {
-    this.isGridVisible = !this.isGridVisible;
-    this.gridLines.forEach((line) => {
-      line.visible(this.isGridVisible);
-    });
-  }
-
-  /**
-   * Add grid lines for reference
-   */
-  private addGrid(): void {
-    // This would require access to layer - extend as needed
-  }
-
-  /**
-   * Highlight a specific box
-   */
-  public highlightBox(index: number, color: string = '#FF6B6B'): void {
-    // Implementation for highlighting
-  }
-}
-
-/**
- * Comparison visualizer for multiple arrays
- */
-class ComparisonVisualizer {
-  private visualizers: ArrayVisualizer[] = [];
-  private container: HTMLElement;
-
-  constructor(containerId: string, arrays: number[][], configs?: Partial<VisualizationConfig>[]) {
-    this.container = document.getElementById(containerId) as HTMLElement;
-    if (!this.container) {
-      throw new Error(`Container not found: ${containerId}`);
-    }
-
-    this.container.style.display = 'flex';
-    this.container.style.gap = '20px';
-    this.container.style.flexWrap = 'wrap';
-
-    arrays.forEach((numbers, index) => {
-      const subContainer = document.createElement('div');
-      subContainer.id = `viz-${index}`;
-      subContainer.style.flex = '1';
-      subContainer.style.minWidth = '400px';
-      subContainer.style.height = '500px';
-      this.container.appendChild(subContainer);
-
-      const config = configs?.[index] || {};
-      const visualizer = new ArrayVisualizer({
-        containerSelector: `#viz-${index}`,
-        numbers,
-        ...config,
-      });
-
-      this.visualizers.push(visualizer);
-    });
-  }
-
-  /**
-   * Update all visualizations
-   */
-  public updateAll(arrays: number[][]): void {
-    arrays.forEach((numbers, index) => {
-      if (this.visualizers[index]) {
-        this.visualizers[index].updateData(numbers);
-      }
-    });
-  }
+/* Transform to range */
+export function transformToRange(point: number, fromStart: number, fromEnd: number, toStart: number, toEnd: number): number {
+  return ((point - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart);
 }
 
 /**
  * Animation utilities
  */
-class AnimationUtils {
+export class AnimationUtils {
   /**
    * Ease-in animation
    */
@@ -123,12 +46,12 @@ class AnimationUtils {
 /**
  * Color utilities for pastel palettes
  */
-class ColorUtils {
+export class ColorUtils {
   /**
    * Generate random pastel color
    */
   static randomPastel(): string {
-    return PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)];
+    return def.PASTEL_COLORS[Math.floor(Math.random() * def.PASTEL_COLORS.length)];
   }
 
   /**
@@ -179,92 +102,3 @@ class ColorUtils {
   }
 }
 
-/**
- * Data utilities
- */
-class DataUtils {
-  /**
-   * Validate if array is sorted
-   */
-  static isSorted(numbers: number[]): boolean {
-    for (let i = 1; i < numbers.length; i++) {
-      if (numbers[i] < numbers[i - 1]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Sort array
-   */
-  static sort(numbers: number[]): number[] {
-    return [...numbers].sort((a, b) => a - b);
-  }
-
-  /**
-   * Generate random array
-   */
-  static generateRandom(size: number, min: number = 0, max: number = 100): number[] {
-    const arr: number[] = [];
-    for (let i = 0; i < size; i++) {
-      arr.push(Math.floor(Math.random() * (max - min + 1)) + min);
-    }
-    return DataUtils.sort(arr);
-  }
-
-  /**
-   * Generate arithmetic sequence
-   */
-  static generateArithmetic(start: number, diff: number, count: number): number[] {
-    const arr: number[] = [];
-    for (let i = 0; i < count; i++) {
-      arr.push(start + i * diff);
-    }
-    return arr;
-  }
-
-  /**
-   * Generate Fibonacci-like sequence
-   */
-  static generateFibonacci(count: number, start1: number = 1, start2: number = 1): number[] {
-    if (count <= 0) return [];
-    if (count === 1) return [start1];
-
-    const arr: number[] = [start1, start2];
-    for (let i = 2; i < count; i++) {
-      arr.push(arr[i - 1] + arr[i - 2]);
-    }
-    return arr;
-  }
-
-  /**
-   * Get statistics about array
-   */
-  static getStats(numbers: number[]): {
-    min: number;
-    max: number;
-    mean: number;
-    median: number;
-    differences: number[];
-  } {
-    const differences: number[] = [];
-    for (let i = 1; i < numbers.length; i++) {
-      differences.push(numbers[i] - numbers[i - 1]);
-    }
-
-    const sorted = [...numbers].sort((a, b) => a - b);
-    const median = sorted.length % 2 === 0 ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2 : sorted[Math.floor(sorted.length / 2)];
-
-    return {
-      min: Math.min(...numbers),
-      max: Math.max(...numbers),
-      mean: numbers.reduce((a, b) => a + b, 0) / numbers.length,
-      median,
-      differences,
-    };
-  }
-}
-
-// Export utilities
-export { AdvancedArrayVisualizer, ComparisonVisualizer, AnimationUtils, ColorUtils, DataUtils };

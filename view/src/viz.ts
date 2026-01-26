@@ -1,8 +1,9 @@
 // This is a file which exposes the API for index.html
 // This is the glue layer between *viz files and elf parsers.
-import * as def from './define'
+import * as def from './define';
 import * as fileviz from './fileviz';
-import * as common from './common'
+import * as vizutil from './vizutils';
+import * as common from './common';
 import Konva from 'konva';
 
 export const actionMap: Record<string, (vscode: any) => void> = {
@@ -31,8 +32,10 @@ export async function showOverview(this: HTMLButtonElement, vscode: any): Promis
     throw new Error(`Container not found: visualization`);
   }
 
-  const width = container.clientWidth || 1200;
-  const height = container.clientHeight || 800;
+  const width = container.clientWidth || def.KONVA_STAGE_WIDTH;
+  const height = container.clientHeight || def.KONVA_STAGE_HEIGHT;
+  console.log("Konva width", width);
+  console.log("Konva height", height);
 
   let stage = new Konva.Stage({
     container: containerString,
@@ -41,43 +44,53 @@ export async function showOverview(this: HTMLButtonElement, vscode: any): Promis
   });
 
   // Generating info from elf header.
+  let info: def.FileArea[] = [];
   const state = vscode.getState() as common.State;
   if (!state) {
     throw new Error("Couldnt get state.");
   }
 
-  if (Object.keys(state).length === 0) {
-    throw new Error("State is empty");
+  if (Object.keys(state.elfHeader).length === 0) {
+    throw new Error("elfHeader is empty");
   }
-  let info: def.FileArea[] = [];
-
 
   // Elf Header data.
-  info.push({
+  const elfHeaderFileArea = {
     name: "Elf Header",
     addr: 0,
     size: state.elfHeader.SizeEH
-  });
+  };
+  console.log(`Elf header file area :`, elfHeaderFileArea);
+  info.push(elfHeaderFileArea);
+
+  if (state.sectionHeaders.length === 0) {
+    throw new Error("sectionHeaders is empty");
+  }
 
   // Section Header Table
-  info.push({
+  const sectionHeaderFileArea = {
     name: "Section Header Table",
     addr: state.elfHeader.StartOfSH,
     size: state.elfHeader.SizeSH * state.elfHeader.NumOfSH
-  })
+  };
+  console.log(`Section header file area :`, sectionHeaderFileArea);
+  info.push(sectionHeaderFileArea);
 
   // Program Header Table
-  info.push({
+  if (state.programHeaders.length === 0) {
+    throw new Error("programHeaders is empty");
+  }
+
+  const programHeaderFileArea = {
     name: "Program Header Table",
     addr: state.elfHeader.StartOfPH,
     size: state.elfHeader.SizePH * state.elfHeader.NumOfPH
-  })
-
+  };
+  console.log(`Program header file area :`, programHeaderFileArea);
+  info.push(programHeaderFileArea);
 
   fileVisualizer = new fileviz.ArrayVisualizer(stage, info);
-
   return;
-
 }
 
 export async function showSections(this: HTMLButtonElement): Promise<void> {

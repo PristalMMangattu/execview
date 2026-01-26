@@ -37,12 +37,19 @@ function initialView(): void {
 function initialize() {
   // Send init message.
   responseHandler.registerHandler("init", (data: string) => {
-    console.log(`Program : ${data}`);
-    let state: common.State = {} as common.State;
-    state.program = data;
-    common.setStatePartial(vscode, state);
-    console.log('State in initialize:', vscode.getState());
-    elf.getElf(vscode, data, responseHandler);
+    try {
+      console.log(`Program : ${data}`);
+      let state: common.State = {} as common.State;
+      state.program = data;
+      common.setStatePartial(vscode, state);
+      const currentState = vscode.getState();
+      console.log('State in initialize:', currentState);
+      elf.getElf(vscode, data, responseHandler);
+      common.getFileSize(vscode, data, responseHandler);
+    } catch (error) {
+      console.error('Error in init handler:', error);
+      console.error('Stack:', (error as Error).stack);
+    }
   });
 
   const msg = {
@@ -71,7 +78,7 @@ document.addEventListener('click', async (event: MouseEvent) => {
   }
 });
 
-// Check if all the required data is received from webview to display the contents
+// Check if all the required data is received from webview to display the initial contents
 const intervalId = setInterval(() => {
   console.log("Checking if data is received.");
   const state = vscode.getState() as common.State;

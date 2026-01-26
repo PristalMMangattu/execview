@@ -58,6 +58,12 @@
           "scope": "window",
           "description": "Path to hex utility."
         },
+        "elfviz.wcPath": {
+          "type": "string",
+          "default": "/usr/bin/wc",
+          "scope": "window",
+          "description": "Path to wc utility."
+        },
         "elfviz.commandTimeout": {
           "type": "number",
           "default": 60,

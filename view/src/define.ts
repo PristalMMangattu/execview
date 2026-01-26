@@ -3,6 +3,12 @@
 export const CHECK_STATE_INTERVAL = 1000; // milliseconds
 // This is the common abstractions on which viz and *viz files depend on.
 
+
+
+/*========== VISUALIZATION PARAMETERS =============*/
+export const KONVA_STAGE_WIDTH = 1200;
+export const KONVA_STAGE_HEIGHT = 2400;
+
 export const PASTEL_COLORS = [
   '#BAE1FF', // Pastel Blue (cool start)
   '#FFB3BA', // Pastel Red (warm contrast)
