@@ -15,6 +15,64 @@ export const actionMap: Record<string, (vscode: any) => void> = {
 
 let fileVisualizer: fileviz.FileOverview | undefined = undefined;
 
+function fillVoidsInElf(info: def.FileArea[]): def.FileArea[] {
+  let completeInfo: def.FileArea[] = [];
+  let prevBoundary = 0;
+  let prevName = '';
+  let prevStart = 0;
+  let voidSize = 0;
+  for (const area of info) {
+    if (prevStart && (area.addr > prevBoundary + 1)) {
+      voidSize = area.addr - prevBoundary - 1;
+      completeInfo.push({
+        name: `VOID : ${voidSize}`,
+        addr: prevBoundary + 1,
+        size: voidSize
+      });
+      console.log(`Void of size, ${voidSize}`);
+      completeInfo.push(area);
+    } else if (area.addr === prevBoundary + 1) {
+      console.log(`No Void between ${prevName} and ${area.name}`);
+      completeInfo.push(area);
+    } else if (prevStart && (prevBoundary + 1 > area.addr)) {
+      if (prevStart >= area.addr) {
+        console.log("previous section start completly masks the start. (this indicates, an issue, that sections are not sorted before)");
+      }
+
+      let overLapStart = area.addr;
+      let overLapEnd = 0;
+      let currentEnd = area.addr + area.size;
+      if (prevBoundary >= currentEnd) {
+        console.log(`${area.name} is completly inside ${prevName}`);
+        overLapEnd = currentEnd;
+        completeInfo.push({
+          name: `OVERLAP: ${prevName} + ${area.name}`,
+          addr: overLapStart,
+          size: overLapEnd - overLapStart
+        });
+      } else {
+        overLapEnd = prevBoundary;
+        const overLapSize = overLapEnd - overLapStart;
+        completeInfo.push({
+          name: `OVERLAP: ${prevName} + ${area.name}\nsize: ${overLapSize}`,
+          addr: overLapStart,
+          size: overLapSize
+        });
+        completeInfo.push({
+          name: area.name,
+          addr: overLapEnd,
+          size: area.size - overLapEnd + overLapStart
+        })
+      }
+    }
+    prevStart = area.addr;
+    prevBoundary = area.addr + area.size;
+    prevName = area.name;
+  }
+
+  return completeInfo;
+}
+
 function elfStructureInfo(vscode: any): def.FileArea[] {
   // Generating info from elf header.
   let info: def.FileArea[] = [];
@@ -58,6 +116,11 @@ function elfStructureInfo(vscode: any): def.FileArea[] {
       size: sect.Size
     } as def.FileArea;
 
+    if (!sect.Offset && !sect.Size) {
+      console.log("Skipping NULL");
+      continue;
+    }
+
     info.push(sectArea);
   }
 
@@ -77,10 +140,9 @@ function elfStructureInfo(vscode: any): def.FileArea[] {
 
   // Sort the info based on addr.
   info.sort((first, second) => first.addr - second.addr);
+  console.log(`Sorted areas: `, info);
 
-
-  // TODO: Insert void area for space which are not part of any valid elf area.
-  return info;
+  return fillVoidsInElf(info);
 }
 
 export async function showOverview(this: HTMLButtonElement, vscode: any): Promise<void> {

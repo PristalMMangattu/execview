@@ -28,6 +28,9 @@ export const PASTEL_COLORS = [
   '#FFF3E0', // Pastel Cream Orange (new warm neutral close)
 ];
 
+export const VOID_COLOR = '#FFFFFF';
+export const OVERLAP_COLOR = '#BEBEBE';
+
 /*========== PARAMETERS FOR DISPLAY PORT =============*/
 export const FV_TOP_MARGINE: number = 80; // Top margin for vizuals
 export const FV_BOTTOM_MARGINE: number = 80; // Top margin for vizuals

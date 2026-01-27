@@ -53,13 +53,20 @@ class FileOverview {
   private calculateBoxes(): void {
     this.boxes = [];
 
+    let color: string = '';
     for (let i = 0; i < this.info.length; i++) {
-      const color = def.PASTEL_COLORS[i % def.PASTEL_COLORS.length];
+      if (this.info[i].name.includes('VOID')) {
+        color = def.VOID_COLOR;
+      } else if (this.info[i].name.includes('OVERLAP')) {
+        color = def.OVERLAP_COLOR;
+      } else {
+        color = def.PASTEL_COLORS[i % def.PASTEL_COLORS.length];
+      }
 
       this.boxes.push({
         value: this.info[i].name,
-        height: 20,
-        yOffset: def.FV_TOP_MARGINE + 20 * i,
+        height: 50,
+        yOffset: def.FV_TOP_MARGINE + 50 * i,
         color,
       });
 
@@ -70,6 +77,8 @@ class FileOverview {
    * Draw stacked boxes
    */
   private drawBoxes(): void {
+    const stageSize = this.boxes.length * 50 + def.FV_TOP_MARGINE * 2;
+    this.stage.height(stageSize);
     for (const box of this.boxes) {
       const x = def.FV_LEFT_MARGINE;
       const y = box.yOffset;
@@ -175,7 +184,7 @@ class FileOverview {
   private initialize(): void {
     this.calculateBoxes();
     this.drawBoxes();
-    this.drawLabels();
+    //this.drawLabels();
     this.layer.draw();
   }
 
