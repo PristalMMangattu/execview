@@ -35,16 +35,35 @@ class FileOverview {
   private labels: Konva.Text[] = [];
   private info: def.FileArea[] = [];
 
-  constructor(stage: Konva.Stage, info: def.FileArea[]) {
+  constructor(stage: string, info: def.FileArea[]) {
     // Validate input
     if (!info || info.length === 0) {
       throw new Error('Numbers array must not be empty');
     }
-    this.stage = stage;
+    this.stage = this.initializeStage(stage);
     this.info = info;
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
     this.initialize();
+  }
+
+  private initializeStage(containerString: string) {
+    // Initialize Konva stage
+    const container = document.querySelector(containerString) as HTMLElement;
+    if (!container) {
+      throw new Error(`Container not found: visualization`);
+    }
+
+    const width = container.clientWidth || def.KONVA_STAGE_WIDTH;
+    const height = container.clientHeight || def.KONVA_STAGE_HEIGHT;
+    console.log("Konva width", width);
+    console.log("Konva height", height);
+
+    return new Konva.Stage({
+      container: containerString,
+      width,
+      height,
+    });
   }
 
   /**
@@ -53,6 +72,7 @@ class FileOverview {
   private calculateBoxes(): void {
     this.boxes = [];
 
+    let cumulativeYOffset = 0;
     let color: string = '';
     for (let i = 0; i < this.info.length; i++) {
       if (this.info[i].name.includes('VOID')) {
@@ -64,11 +84,12 @@ class FileOverview {
       }
 
       this.boxes.push({
-        value: this.info[i].name,
-        height: 50,
-        yOffset: def.FV_TOP_MARGINE + 50 * i,
+        value: `${this.info[i].name}`,
+        height: def.FV_MAX_HEIGHT,
+        yOffset: def.FV_TOP_MARGINE + cumulativeYOffset,
         color,
       });
+      cumulativeYOffset = cumulativeYOffset + def.FV_MAX_HEIGHT;
 
     }
   }
@@ -79,8 +100,9 @@ class FileOverview {
   private drawBoxes(): void {
     const stageSize = this.boxes.length * 50 + def.FV_TOP_MARGINE * 2;
     this.stage.height(stageSize);
+    let idx = 0;
     for (const box of this.boxes) {
-      const x = def.FV_LEFT_MARGINE;
+      const x = def.FV_FILE_PLACEMENT_X;
       const y = box.yOffset;
 
       const rectGroup = new Konva.Group({
@@ -102,6 +124,7 @@ class FileOverview {
         shadowOpacity: 0.5,
       }));
 
+      // Text inside sections
       rectGroup.add(new Konva.Text({
         text: box.value,
         fontSize: 14,
@@ -113,8 +136,24 @@ class FileOverview {
         verticalAlign: 'middle',
       }));
 
+      // Begin address
+      const addr = new Konva.Text({
+        x: def.FV_ADDR_PLACEMENT_X,
+        y: box.yOffset,
+        width: 50,
+        text: `${this.info[idx].addr}`,
+        fontSize: 12,
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        fill: '#333',
+        align: 'right',
+        padding: 2,
+      });
+
       this.layer.add(rectGroup);
+      this.layer.add(addr);
       this.rectangles.push(rectGroup);
+      idx = idx + 1;
     }
   }
 
@@ -137,7 +176,7 @@ class FileOverview {
 
     // Legend
     let legendY = 50;
-    const legendX = def.FV_LEFT_MARGINE + def.FV_BOX_WIDTH + 60;
+    const legendX = def.FV_FILE_PLACEMENT_X + def.FV_BOX_WIDTH + 60;
 
     const legendTitle = new Konva.Text({
       x: legendX,

@@ -40,10 +40,11 @@ export const FV_BOTTOM_MARGINE: number = 80; // Top margin for vizuals
 
 /* Config for file view */
 export const FV_BOX_WIDTH: number = 300; // Width of each boxs
-export const FV_MINIMUM_SIZE: number = 100; // if size is less than this then to display the name properly this will be considered.
-export const FV_LEFT_MARGINE: number = 80; // Left margin for vizuals
+export const FV_FILE_PLACEMENT_X: number = 100; // Left margin for vizuals
+export const FV_ADDR_PLACEMENT_X: number = 50; // Left margin for vizuals
+export const FV_ADDR_PADDING: number = 2.5; // Left margin for vizuals
 export const FV_SCALE_FACTOR: number = 0.5; // The view will be scaled by this factor.
-export const FV_ANIMATE: boolean = true;
+export const FV_MAX_HEIGHT: number = 50; // Maximum Height cutoff for file view.
 
 /* Files sections info that should be derived from elf header */
 export interface FileArea {

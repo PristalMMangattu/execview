@@ -18,60 +18,26 @@ let fileVisualizer: fileviz.FileOverview | undefined = undefined;
 function fillVoidsInElf(info: def.FileArea[]): def.FileArea[] {
   let completeInfo: def.FileArea[] = [];
   let prevBoundary = 0;
-  let prevName = '';
   let prevStart = 0;
   let voidSize = 0;
   for (const area of info) {
-    if (prevStart && (area.addr > prevBoundary + 1)) {
-      voidSize = area.addr - prevBoundary - 1;
+    if (prevStart && (area.addr > prevBoundary)) {
+      voidSize = area.addr - prevBoundary;
       completeInfo.push({
         name: `VOID : ${voidSize}`,
-        addr: prevBoundary + 1,
+        addr: prevBoundary,
         size: voidSize
       });
       console.log(`Void of size, ${voidSize}`);
-      completeInfo.push(area);
-    } else if (area.addr === prevBoundary + 1) {
-      console.log(`No Void between ${prevName} and ${area.name}`);
-      completeInfo.push(area);
-    } else if (prevStart && (prevBoundary + 1 > area.addr)) {
-      if (prevStart >= area.addr) {
-        console.log("previous section start completly masks the start. (this indicates, an issue, that sections are not sorted before)");
-      }
-
-      let overLapStart = area.addr;
-      let overLapEnd = 0;
-      let currentEnd = area.addr + area.size;
-      if (prevBoundary >= currentEnd) {
-        console.log(`${area.name} is completly inside ${prevName}`);
-        overLapEnd = currentEnd;
-        completeInfo.push({
-          name: `OVERLAP: ${prevName} + ${area.name}`,
-          addr: overLapStart,
-          size: overLapEnd - overLapStart
-        });
-      } else {
-        overLapEnd = prevBoundary;
-        const overLapSize = overLapEnd - overLapStart;
-        completeInfo.push({
-          name: `OVERLAP: ${prevName} + ${area.name}\nsize: ${overLapSize}`,
-          addr: overLapStart,
-          size: overLapSize
-        });
-        completeInfo.push({
-          name: area.name,
-          addr: overLapEnd,
-          size: area.size - overLapEnd + overLapStart
-        })
-      }
     }
+    completeInfo.push(area);
     prevStart = area.addr;
     prevBoundary = area.addr + area.size;
-    prevName = area.name;
   }
 
   return completeInfo;
 }
+
 
 function elfStructureInfo(vscode: any): def.FileArea[] {
   // Generating info from elf header.
@@ -155,25 +121,9 @@ export async function showOverview(this: HTMLButtonElement, vscode: any): Promis
   }
 
   const containerString = "#visualization";
-  // Initialize Konva stage
-  const container = document.querySelector(containerString) as HTMLElement;
-  if (!container) {
-    throw new Error(`Container not found: visualization`);
-  }
-
-  const width = container.clientWidth || def.KONVA_STAGE_WIDTH;
-  const height = container.clientHeight || def.KONVA_STAGE_HEIGHT;
-  console.log("Konva width", width);
-  console.log("Konva height", height);
-
-  let stage = new Konva.Stage({
-    container: containerString,
-    width,
-    height,
-  });
 
   const info = elfStructureInfo(vscode);
-  fileVisualizer = new fileviz.FileOverview(stage, info);
+  fileVisualizer = new fileviz.FileOverview(containerString, info);
   return;
 }
 
