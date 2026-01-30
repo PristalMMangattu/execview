@@ -1,0 +1,355 @@
+{
+  "elf_header": {
+    "description": "The ELF header is described by the type Elf32_Ehdr or Elf64_Ehdr",
+    "fields": {
+      "e_ident": {
+        "description": "This array of bytes specifies how to interpret the file, independent of the processor or the file's remaining contents.",
+        "macros": {
+          "EI_MAG0": "The first byte of the magic number. It must be filled with ELFMAG0. (0: 0x7f)",
+          "EI_MAG1": "The second byte of the magic number. It must be filled with ELFMAG1. (1: 'E')",
+          "EI_MAG2": "The third byte of the magic number. It must be filled with ELFMAG2. (2: 'L')",
+          "EI_MAG3": "The fourth byte of the magic number. It must be filled with ELFMAG3. (3: 'F')",
+          "EI_CLASS": {
+            "description": "The fifth byte identifies the architecture for this binary",
+            "ELFCLASSNONE": "This class is invalid.",
+            "ELFCLASS32": "This defines the 32-bit architecture. It supports machines with files and virtual address spaces up to 4 Gigabytes.",
+            "ELFCLASS64": "This defines the 64-bit architecture."
+          },
+          "EI_DATA": {
+            "description": "The sixth byte specifies the data encoding of the processor-specific data in the file.",
+            "ELFDATANONE": "Unknown data format.",
+            "ELFDATA2LSB": "Two's complement, little-endian.",
+            "ELFDATA2MSB": "Two's complement, big-endian."
+          },
+          "EI_VERSION": {
+            "description": "The seventh byte is the version number of the ELF specification",
+            "EV_NONE": "Invalid version.",
+            "EV_CURRENT": "Current version."
+          },
+          "EI_OSABI": {
+            "description": "The eighth byte identifies the operating system and ABI to which the object is targeted.",
+            "ELFOSABI_NONE": "Same as ELFOSABI_SYSV",
+            "ELFOSABI_SYSV": "UNIX System V ABI",
+            "ELFOSABI_HPUX": "HP-UX ABI",
+            "ELFOSABI_NETBSD": "NetBSD ABI",
+            "ELFOSABI_LINUX": "Linux ABI",
+            "ELFOSABI_SOLARIS": "Solaris ABI",
+            "ELFOSABI_IRIX": "IRIX ABI",
+            "ELFOSABI_FREEBSD": "FreeBSD ABI",
+            "ELFOSABI_TRU64": "TRU64 UNIX ABI",
+            "ELFOSABI_ARM": "ARM architecture ABI",
+            "ELFOSABI_STANDALONE": "Stand-alone (embedded) ABI"
+          },
+          "EI_ABIVERSION": "The ninth byte identifies the version of the ABI to which the object is targeted.",
+          "EI_PAD": "Start of padding. These bytes are reserved and set to zero.",
+          "EI_NIDENT": "The size of the e_ident array."
+        }
+      },
+      "e_type": {
+        "description": "This member of the structure identifies the object file type",
+        "ET_NONE": "An unknown type.",
+        "ET_REL": "A relocatable file.",
+        "ET_EXEC": "An executable file.",
+        "ET_DYN": "A shared object.",
+        "ET_CORE": "A core file."
+      },
+      "e_machine": {
+        "description": "This member specifies the required architecture for an individual file.",
+        "EM_NONE": "An unknown machine",
+        "EM_M32": "AT&T WE 32100",
+        "EM_SPARC": "Sun Microsystems SPARC",
+        "EM_386": "Intel 80386",
+        "EM_68K": "Motorola 68000",
+        "EM_88K": "Motorola 88000",
+        "EM_860": "Intel 80860",
+        "EM_MIPS": "MIPS RS3000 (big-endian only)",
+        "EM_PARISC": "HP/PA",
+        "EM_SPARC32PLUS": "SPARC with enhanced instruction set",
+        "EM_PPC": "PowerPC",
+        "EM_PPC64": "PowerPC 64-bit",
+        "EM_S390": "IBM S/390",
+        "EM_ARM": "Advanced RISC Machines",
+        "EM_SH": "Renesas SuperH",
+        "EM_SPARCV9": "SPARC v9 64-bit",
+        "EM_IA_64": "Intel Itanium",
+        "EM_X86_64": "AMD x86-64",
+        "EM_VAX": "DEC Vax"
+      },
+      "e_version": {
+        "description": "This member identifies the file version",
+        "EV_NONE": "Invalid version",
+        "EV_CURRENT": "Current version"
+      },
+      "e_entry": "This member gives the virtual address to which the system first transfers control, thus starting the process.",
+      "e_phoff": "This member holds the program header table's file offset in bytes.",
+      "e_shoff": "This member holds the section header table's file offset in bytes.",
+      "e_flags": "This member holds processor-specific flags associated with the file.",
+      "e_ehsize": "This member holds the ELF header's size in bytes.",
+      "e_phentsize": "This member holds the size in bytes of one entry in the file's program header table.",
+      "e_phnum": "This member holds the number of entries in the program header table.",
+      "e_shentsize": "This member holds a sections header's size in bytes.",
+      "e_shnum": "This member holds the number of entries in the section header table.",
+      "e_shstrndx": "This member holds the section header table index of the entry associated with the section name string table."
+    }
+  },
+  "program_header": {
+    "description": "Program header (Phdr)",
+    "fields": {
+      "p_type": {
+        "description": "This member of the structure indicates what kind of segment this array element describes",
+        "PT_NULL": "The array element is unused and the other members' values are undefined.",
+        "PT_LOAD": "The array element specifies a loadable segment, described by p_filesz and p_memsz.",
+        "PT_DYNAMIC": "The array element specifies dynamic linking information.",
+        "PT_INTERP": "The array element specifies the location and size of a null-terminated pathname to invoke as an interpreter.",
+        "PT_NOTE": "The array element specifies the location of notes (ElfN_Nhdr).",
+        "PT_SHLIB": "This segment type is reserved but has unspecified semantics.",
+        "PT_PHDR": "The array element, if present, specifies the location and size of the program header table itself.",
+        "PT_LOPROC": "Values in the inclusive range [PT_LOPROC, PT_HIPROC] are reserved for processor-specific semantics.",
+        "PT_HIPROC": "Values in the inclusive range [PT_LOPROC, PT_HIPROC] are reserved for processor-specific semantics.",
+        "PT_GNU_STACK": "GNU extension which is used by the Linux kernel to control the state of the stack via the flags set in the p_flags member."
+      },
+      "p_offset": "This member holds the offset from the beginning of the file at which the first byte of the segment resides.",
+      "p_vaddr": "This member holds the virtual address at which the first byte of the segment resides in memory.",
+      "p_paddr": "On systems for which physical addressing is relevant, this member is reserved for the segment's physical address.",
+      "p_filesz": "This member holds the number of bytes in the file image of the segment. It may be zero.",
+      "p_memsz": "This member holds the number of bytes in the memory image of the segment. It may be zero.",
+      "p_flags": {
+        "description": "This member holds a bit mask of flags relevant to the segment",
+        "PF_X": "An executable segment.",
+        "PF_W": "A writable segment.",
+        "PF_R": "A readable segment."
+      },
+      "p_align": "This member holds the value to which the segments are aligned in memory and in the file."
+    }
+  },
+  "section_header": {
+    "description": "Section header (Shdr)",
+    "reserved_indices": {
+      "SHN_UNDEF": "This value marks an undefined, missing, irrelevant, or otherwise meaningless section reference.",
+      "SHN_LORESERVE": "This value specifies the lower bound of the range of reserved indices.",
+      "SHN_LOPROC": "Values in the inclusive range [SHN_LOPROC, SHN_HIPROC] are reserved for processor-specific semantics.",
+      "SHN_HIPROC": "Values in the inclusive range [SHN_LOPROC, SHN_HIPROC] are reserved for processor-specific semantics.",
+      "SHN_ABS": "This value specifies the absolute value for the corresponding reference.",
+      "SHN_COMMON": "Symbols defined relative to this section are common symbols.",
+      "SHN_HIRESERVE": "This value specifies the upper bound of the range of reserved indices."
+    },
+    "fields": {
+      "sh_name": "This member specifies the name of the section.",
+      "sh_type": {
+        "description": "This member categorizes the section's contents and semantics",
+        "SHT_NULL": "This value marks the section header as inactive.",
+        "SHT_PROGBITS": "This section holds information defined by the program.",
+        "SHT_SYMTAB": "This section holds a symbol table.",
+        "SHT_STRTAB": "This section holds a string table.",
+        "SHT_RELA": "This section holds relocation entries with explicit addends.",
+        "SHT_HASH": "This section holds a symbol hash table.",
+        "SHT_DYNAMIC": "This section holds information for dynamic linking.",
+        "SHT_NOTE": "This section holds notes (ElfN_Nhdr).",
+        "SHT_NOBITS": "A section of this type occupies no space in the file but otherwise resembles SHT_PROGBITS.",
+        "SHT_REL": "This section holds relocation offsets without explicit addends.",
+        "SHT_SHLIB": "This section is reserved but has unspecified semantics.",
+        "SHT_DYNSYM": "This section holds a minimal set of dynamic linking symbols.",
+        "SHT_LOPROC": "Values in the inclusive range [SHT_LOPROC, SHT_HIPROC] are reserved for processor-specific semantics.",
+        "SHT_HIPROC": "Values in the inclusive range [SHT_LOPROC, SHT_HIPROC] are reserved for processor-specific semantics.",
+        "SHT_LOUSER": "This value specifies the lower bound of the range of indices reserved for application programs.",
+        "SHT_HIUSER": "This value specifies the upper bound of the range of indices reserved for application programs."
+      },
+      "sh_flags": {
+        "description": "Sections support one-bit flags that describe miscellaneous attributes",
+        "SHF_WRITE": "This section contains data that should be writable during process execution.",
+        "SHF_ALLOC": "This section occupies memory during process execution.",
+        "SHF_EXECINSTR": "This section contains executable machine instructions.",
+        "SHF_MASKPROC": "All bits included in this mask are reserved for processor-specific semantics."
+      },
+      "sh_addr": "If this section appears in the memory image of a process, this member holds the address at which the section's first byte should reside.",
+      "sh_offset": "This member's value holds the byte offset from the beginning of the file to the first byte in the section.",
+      "sh_size": "This member holds the section's size in bytes.",
+      "sh_link": "This member holds a section header table index link, whose interpretation depends on the section type.",
+      "sh_info": "This member holds extra information, whose interpretation depends on the section type.",
+      "sh_addralign": "Some sections have address alignment constraints.",
+      "sh_entsize": "Some sections hold a table of fixed-sized entries, such as a symbol table."
+    },
+    "special_sections": {
+      ".bss": "This section holds uninitialized data that contributes to the program's memory image. Type: SHT_NOBITS. Attributes: SHF_ALLOC, SHF_WRITE.",
+      ".comment": "This section holds version control information. Type: SHT_PROGBITS.",
+      ".ctors": "This section holds initialized pointers to the C++ constructor functions. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_WRITE.",
+      ".data": "This section holds initialized data that contribute to the program's memory image. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_WRITE.",
+      ".data1": "This section holds initialized data that contribute to the program's memory image. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_WRITE.",
+      ".debug": "This section holds information for symbolic debugging. Type: SHT_PROGBITS.",
+      ".dtors": "This section holds initialized pointers to the C++ destructor functions. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_WRITE.",
+      ".dynamic": "This section holds dynamic linking information. Type: SHT_DYNAMIC. Attributes: SHF_ALLOC.",
+      ".dynstr": "This section holds strings needed for dynamic linking. Type: SHT_STRTAB. Attributes: SHF_ALLOC.",
+      ".dynsym": "This section holds the dynamic linking symbol table. Type: SHT_DYNSYM. Attributes: SHF_ALLOC.",
+      ".fini": "This section holds executable instructions that contribute to the process termination code. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_EXECINSTR.",
+      ".gnu.version": "This section holds the version symbol table. Type: SHT_GNU_versym. Attributes: SHF_ALLOC.",
+      ".gnu.version_d": "This section holds the version symbol definitions. Type: SHT_GNU_verdef. Attributes: SHF_ALLOC.",
+      ".gnu.version_r": "This section holds the version symbol needed elements. Type: SHT_GNU_versym. Attributes: SHF_ALLOC.",
+      ".got": "This section holds the global offset table. Type: SHT_PROGBITS.",
+      ".hash": "This section holds a symbol hash table. Type: SHT_HASH. Attributes: SHF_ALLOC.",
+      ".init": "This section holds executable instructions that contribute to the process initialization code. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_EXECINSTR.",
+      ".interp": "This section holds the pathname of a program interpreter. Type: SHT_PROGBITS.",
+      ".line": "This section holds line number information for symbolic debugging. Type: SHT_PROGBITS.",
+      ".note": "This section holds various notes. Type: SHT_NOTE.",
+      ".note.ABI-tag": "This section is used to declare the expected run-time ABI of the ELF image. Type: SHT_NOTE. Attributes: SHF_ALLOC.",
+      ".note.gnu.build-id": "This section is used to hold an ID that uniquely identifies the contents of the ELF image. Type: SHT_NOTE. Attributes: SHF_ALLOC.",
+      ".note.GNU-stack": "This section is used in Linux object files for declaring stack attributes. Type: SHT_PROGBITS. Attributes: SHF_EXECINSTR.",
+      ".note.openbsd.ident": "OpenBSD native executables usually contain this section to identify themselves. Type: SHT_NOTE.",
+      ".plt": "This section holds the procedure linkage table. Type: SHT_PROGBITS.",
+      ".rel.NAME": "This section holds relocation information (without addend). Type: SHT_REL.",
+      ".rela.NAME": "This section holds relocation information (with addend). Type: SHT_RELA.",
+      ".rodata": "This section holds read-only data that typically contributes to a nonwritable segment. Type: SHT_PROGBITS. Attributes: SHF_ALLOC.",
+      ".rodata1": "This section holds read-only data that typically contributes to a nonwritable segment. Type: SHT_PROGBITS. Attributes: SHF_ALLOC.",
+      ".shstrtab": "This section holds section names. Type: SHT_STRTAB.",
+      ".strtab": "This section holds strings, most commonly the strings that represent the names associated with symbol table entries. Type: SHT_STRTAB.",
+      ".symtab": "This section holds a symbol table. Type: SHT_SYMTAB.",
+      ".text": "This section holds the executable instructions of a program. Type: SHT_PROGBITS. Attributes: SHF_ALLOC, SHF_EXECINSTR."
+    }
+  },
+  "symbol_table": {
+    "description": "String and symbol tables",
+    "st_info": {
+      "type": {
+        "STT_NOTYPE": "The symbol's type is not defined.",
+        "STT_OBJECT": "The symbol is associated with a data object.",
+        "STT_FUNC": "The symbol is associated with a function or other executable code.",
+        "STT_SECTION": "The symbol is associated with a section.",
+        "STT_FILE": "By convention, the symbol's name gives the name of the source file associated with the object file.",
+        "STT_LOPROC": "Values in the inclusive range [STT_LOPROC, STT_HIPROC] are reserved for processor-specific semantics.",
+        "STT_HIPROC": "Values in the inclusive range [STT_LOPROC, STT_HIPROC] are reserved for processor-specific semantics."
+      },
+      "binding": {
+        "STB_LOCAL": "Local symbols are not visible outside the object file containing their definition.",
+        "STB_GLOBAL": "Global symbols are visible to all object files being combined.",
+        "STB_WEAK": "Weak symbols resemble global symbols, but their definitions have lower precedence.",
+        "STB_LOPROC": "Values in the inclusive range [STB_LOPROC, STB_HIPROC] are reserved for processor-specific semantics.",
+        "STB_HIPROC": "Values in the inclusive range [STB_LOPROC, STB_HIPROC] are reserved for processor-specific semantics."
+      }
+    },
+    "st_other": {
+      "visibility": {
+        "STV_DEFAULT": "Default symbol visibility rules.",
+        "STV_INTERNAL": "Processor-specific hidden class.",
+        "STV_HIDDEN": "Symbol is unavailable to other modules.",
+        "STV_PROTECTED": "Symbol is available to other modules, but references in the local module always resolve to the local symbol."
+      }
+    }
+  },
+  "relocation": {
+    "description": "Relocation entries (Rel & Rela)",
+    "fields": {
+      "r_offset": "This member gives the location at which to apply the relocation action.",
+      "r_info": "This member gives both the symbol table index with respect to which the relocation must be made and the type of relocation to apply.",
+      "r_addend": "This member specifies a constant addend used to compute the value to be stored into the relocatable field."
+    }
+  },
+  "dynamic_tags": {
+    "description": "Dynamic tags (Dyn) - The .dynamic section contains a series of structures that hold relevant dynamic linking information",
+    "tags": {
+      "DT_NULL": "Marks end of dynamic section",
+      "DT_NEEDED": "String table offset to name of a needed library",
+      "DT_PLTRELSZ": "Size in bytes of PLT relocation entries",
+      "DT_PLTGOT": "Address of PLT and/or GOT",
+      "DT_HASH": "Address of symbol hash table",
+      "DT_STRTAB": "Address of string table",
+      "DT_SYMTAB": "Address of symbol table",
+      "DT_RELA": "Address of Rela relocation table",
+      "DT_RELASZ": "Size in bytes of the Rela relocation table",
+      "DT_RELAENT": "Size in bytes of a Rela relocation table entry",
+      "DT_STRSZ": "Size in bytes of string table",
+      "DT_SYMENT": "Size in bytes of a symbol table entry",
+      "DT_INIT": "Address of the initialization function",
+      "DT_FINI": "Address of the termination function",
+      "DT_SONAME": "String table offset to name of shared object",
+      "DT_RPATH": "String table offset to search path for direct and indirect library dependencies",
+      "DT_SYMBOLIC": "Alert linker to search this shared object before the executable for symbols",
+      "DT_REL": "Address of Rel relocation table",
+      "DT_RELSZ": "Size in bytes of Rel relocation table",
+      "DT_RELENT": "Size in bytes of a Rel table entry",
+      "DT_PLTREL": "Type of relocation entry to which the PLT refers (Rela or Rel)",
+      "DT_DEBUG": "Undefined use for debugging",
+      "DT_TEXTREL": "Absence of this entry indicates that no relocation entries should apply to a nonwritable segment",
+      "DT_JMPREL": "Address of relocation entries associated solely with the PLT",
+      "DT_BIND_NOW": "Instruct dynamic linker to process all relocations before transferring control to the executable",
+      "DT_RUNPATH": "String table offset to search path for direct library dependencies",
+      "DT_LOPROC": "Values in the inclusive range [DT_LOPROC, DT_HIPROC] are reserved for processor-specific semantics",
+      "DT_HIPROC": "Values in the inclusive range [DT_LOPROC, DT_HIPROC] are reserved for processor-specific semantics"
+    }
+  },
+  "notes": {
+    "description": "Notes (Nhdr) - ELF notes allow for appending arbitrary information for the system to use. They are largely used by core files (e_type of ET_CORE), but many projects define their own set of extensions.",
+    "fields": {
+      "n_namesz": "The length of the name field in bytes. The contents will immediately follow this note in memory. The name is null terminated. For example, if the name is 'GNU', then n_namesz will be set to 4.",
+      "n_descsz": "The length of the descriptor field in bytes. The contents will immediately follow the name field in memory.",
+      "n_type": "Depending on the value of the name field, this member may have various values as defined below."
+    },
+    "core_file_notes": {
+      "description": "Notes used by core files (e_type = ET_CORE). These are highly operating system or architecture specific and often require close coordination with kernels, C libraries, and debuggers.",
+      "NT_PRSTATUS": "prstatus struct",
+      "NT_FPREGSET": "fpregset struct",
+      "NT_PRPSINFO": "prpsinfo struct",
+      "NT_PRXREG": "prxregset struct",
+      "NT_TASKSTRUCT": "task structure",
+      "NT_PLATFORM": "String from sysinfo(SI_PLATFORM)",
+      "NT_AUXV": "auxv array",
+      "NT_GWINDOWS": "gwindows struct",
+      "NT_ASRS": "asrset struct",
+      "NT_PSTATUS": "pstatus struct",
+      "NT_PSINFO": "psinfo struct",
+      "NT_PRCRED": "prcred struct",
+      "NT_UTSNAME": "utsname struct",
+      "NT_LWPSTATUS": "lwpstatus struct",
+      "NT_LWPSINFO": "lwpinfo struct",
+      "NT_PRFPXREG": "fprxregset struct",
+      "NT_SIGINFO": "siginfo_t (size might increase over time)",
+      "NT_FILE": "Contains information about mapped files",
+      "NT_PRXFPREG": "user_fxsr_struct",
+      "NT_PPC_VMX": "PowerPC Altivec/VMX registers",
+      "NT_PPC_SPE": "PowerPC SPE/EVR registers",
+      "NT_PPC_VSX": "PowerPC VSX registers",
+      "NT_386_TLS": "i386 TLS slots (struct user_desc)",
+      "NT_386_IOPERM": "x86 io permission bitmap (1=deny)",
+      "NT_X86_XSTATE": "x86 extended state using xsave",
+      "NT_S390_HIGH_GPRS": "s390 upper register halves",
+      "NT_S390_TIMER": "s390 timer register",
+      "NT_S390_TODCMP": "s390 time-of-day (TOD) clock comparator register",
+      "NT_S390_TODPREG": "s390 time-of-day (TOD) programmable register",
+      "NT_S390_CTRS": "s390 control registers",
+      "NT_S390_PREFIX": "s390 prefix register",
+      "NT_S390_LAST_BREAK": "s390 breaking event address",
+      "NT_S390_SYSTEM_CALL": "s390 system call restart data",
+      "NT_S390_TDB": "s390 transaction diagnostic block",
+      "NT_ARM_VFP": "ARM VFP/NEON registers",
+      "NT_ARM_TLS": "ARM TLS register",
+      "NT_ARM_HW_BREAK": "ARM hardware breakpoint registers",
+      "NT_ARM_HW_WATCH": "ARM hardware watchpoint registers",
+      "NT_ARM_SYSTEM_CALL": "ARM system call number"
+    },
+    "gnu_extensions": {
+      "description": "Extensions used by the GNU tool chain (n_name = GNU)",
+      "NT_GNU_ABI_TAG": {
+        "description": "Operating system (OS) ABI information. The desc field contains 4 words",
+        "details": {
+          "[0]": "OS descriptor (ELF_NOTE_OS_LINUX, ELF_NOTE_OS_GNU, and so on)",
+          "[1]": "major version of the ABI",
+          "[2]": "minor version of the ABI",
+          "[3]": "subminor version of the ABI"
+        }
+      },
+      "NT_GNU_HWCAP": {
+        "description": "Synthetic hwcap information. The desc field begins with two words",
+        "details": {
+          "[0]": "number of entries",
+          "[1]": "bit mask of enabled entries",
+          "note": "Then follow variable-length entries, one byte followed by a null-terminated hwcap name string"
+        }
+      },
+      "NT_GNU_BUILD_ID": "Unique build ID as generated by the GNU ld(1) --build-id option. The desc consists of any nonzero number of bytes.",
+      "NT_GNU_GOLD_VERSION": "The desc contains the GNU Gold linker version used."
+    },
+    "default_unknown_namespace": {
+      "description": "Default/unknown namespace notes (e_type != ET_CORE). These are used when the namespace is the default (i.e., n_namesz will be set to 0), or a fallback when the namespace is unknown.",
+      "NT_VERSION": "A version string of some sort.",
+      "NT_ARCH": "Architecture information."
+    }
+  }
+}

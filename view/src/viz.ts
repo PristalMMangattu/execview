@@ -24,7 +24,7 @@ function fillVoidsInElf(info: def.FileArea[]): def.FileArea[] {
     if (prevStart && (area.addr > prevBoundary)) {
       voidSize = area.addr - prevBoundary;
       completeInfo.push({
-        name: `VOID : ${voidSize}`,
+        name: `VOID`,
         addr: prevBoundary,
         size: voidSize
       });

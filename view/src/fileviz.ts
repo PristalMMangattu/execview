@@ -84,7 +84,7 @@ class FileOverview {
       }
 
       this.boxes.push({
-        value: `${this.info[i].name}`,
+        value: `${this.info[i].name}\nSize: ${this.info[i].size}`,
         height: def.FV_MAX_HEIGHT,
         yOffset: def.FV_TOP_MARGINE + cumulativeYOffset,
         color,
