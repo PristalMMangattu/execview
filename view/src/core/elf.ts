@@ -1,4 +1,4 @@
-import * as intf from '../../intf/interface';
+import * as intf from '../../../intf/interface';
 import * as common from './common';
 
 export interface ElfHeader {

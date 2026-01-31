@@ -1,4 +1,4 @@
-import * as intf from '../../intf/interface';
+import * as intf from '../../../intf/interface';
 import * as elf from './elf';
 import * as common from './common';
 import * as viz from './viz';

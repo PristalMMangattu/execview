@@ -2,7 +2,6 @@
 // This is the glue layer between *viz files and elf parsers.
 import * as def from './define';
 import * as fileviz from './fileviz';
-import * as vizutil from './vizutils';
 import * as common from './common';
 import Konva from 'konva';
 
