@@ -1,25 +1,24 @@
+import { VscodeButton } from "@vscode-elements/react-elements";
 
-declare namespace JSX {
-  interface IntrinsicElements {
-    'vscode-button': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-      appearance?: 'primary' | 'secondary' | 'icon';
-      disabled?: boolean;
-      autofocus?: boolean;
-    };
-  }
-}
 
 export function Header() {
+  const bstyle = {
+    margin: "2px",
+  }
+  const hstyle = {
+    fontSize: "1.5em",
+    fontWeight: "bold",
+  }
   return (
     <header>
       <h1>
-        <span className="enlarged">E</span>xecutable &amp; <span class="enlarged">L</span>inkable <span class="enlarged">F</span>ormat
+        <span className="enlarged" style={hstyle}>E</span>xecutable &amp; <span className="enlarged" style={hstyle}>L</span>inkable <span className="enlarged" style={hstyle}>F</span>ormat
       </h1>
       <nav className="navigation">
-        <vscode-button className="btn" id="Overview">📁 Overview</vscode-button>
-        <vscode-button className="btn" id="Sections">📊 Sections</vscode-button>
-        <vscode-button className="btn" id="Segments">⚙️ Segments</vscode-button>
-        <vscode-button className="btn" id="Symbols">🔍 Symbols &amp Strings </vscode-button>
+        <VscodeButton className="btn" id="Overview" style={bstyle}>📁 Overview</VscodeButton>
+        <VscodeButton className="btn" id="Sections" style={bstyle}>📊 Sections</VscodeButton>
+        <VscodeButton className="btn" id="Segments" style={bstyle}>⚙️ Segments</VscodeButton>
+        <VscodeButton className="btn" id="Symbols" style={bstyle}>🔍 Symbols & Strings </VscodeButton>
       </nav>
     </header>
   )
