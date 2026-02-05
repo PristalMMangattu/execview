@@ -164,7 +164,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@vscode-elements/elements": "^2.4.0",
     "ajv": "^8.17.1",
     "vsce": "^2.15.0",
     "winston": "^3.19.0",
